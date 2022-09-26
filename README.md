@@ -163,7 +163,7 @@
 - Snakefile의 rule all의 input 파일들은 모든 rule들이 진행되면 생성될 output file들이다.
 
 ### Troubleshooting & Issues
-    - Snakemake 실행에 문제가 있으면, raw data와 (fastq) genome reference 파일들을 (fasta, gtf/gff) 확인하고, 확장자와 형태가 맞는지 확인한다.
-    - Config 파일에 오타가 없고, 데이터에 맞도록 수정이 되어있음을 꼭 확인한다.
-    - 각 툴의 파라미터 설정에 오류가 있는 경우, 데이터와 파라미터가 맞지 않는 경우, 데이터에 문제가 있는 경우 등을 고려한다.
-    - Snakefile, config.yaml, 그리고 smk 파일의 코드에 오류가 있을 경우, GitHub 담당자에게 문의한다.
+- Snakemake 실행에 문제가 있으면, raw data와 (fastq) genome reference 파일들을 (fasta, gtf/gff) 확인하고, 확장자와 형태가 맞는지 확인한다.
+- Config 파일에 오타가 없고, 데이터에 맞도록 수정이 되어있음을 꼭 확인한다.
+- 각 툴의 파라미터 설정에 오류가 있는 경우, 데이터와 파라미터가 맞지 않는 경우, 데이터에 문제가 있는 경우 등을 고려한다.
+- Snakefile, config.yaml, 그리고 smk 파일의 코드에 오류가 있을 경우, GitHub 담당자에게 문의한다.
