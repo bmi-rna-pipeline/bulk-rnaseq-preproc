@@ -1,8 +1,6 @@
 # RNA-Seq Pre-Processing Snakemake Pipeline
 ## RNA-Seq data pre-processing Snakemake Pipeline for BMI Lab, SNUH
 
------------------------------
-
 ### Snakemake 기본 설명
 
 1. Environment Setup
