@@ -1,0 +1,109 @@
+from snakemake.utils import min_version
+
+##### set minimum snakemake version #####
+min_version("6.4.1")
+
+import pandas as pd
+import os
+import re
+
+configfile: "workflow/config.yaml"
+
+# set number of threads to use from config
+THREADS = config['threads']
+
+# get working directory path
+DATAPATH = os.getcwd()
+filecnt = len(os.listdir("./data/"))
+
+# get names and path of fastq/fq files
+fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")][i]) for i in range(0, filecnt)]
+
+# rename if fq.gz -> fastq.gz
+samplefull = [os.path.splitext(os.path.basename(fqpath[i]))[0].split('.')[0] for i in range(0, len(fqpath))] # full names of the samples incl reads
+for i in range(0, len(fqpath)):
+  if fqpath[i].endswith("fq.gz"):
+    os.rename(fqpath[i], f"./data/{samplefull[i]}.fastq.gz")
+
+# determine if pe or se data and set reads
+for i in range(0, len(fqpath)):
+  for word in fqpath[i].split('.fastq.gz'):
+    if word.endswith('_2'):
+      ENDS = "PE"
+    elif word.endswith('_SE'):
+      ENDS = "SE"
+
+if ENDS == "PE":
+  READS = ["1", "2"]
+else:
+  READS = "SE"
+
+# get names of samples
+SAMPLES = list(set(['_'.join((samplefull[i].split('_'))[:-1]) for i in range(0, filecnt)]))
+
+# get fasta file name and rename if fasta -> fa
+fapath  = f"{DATAPATH}/generef/" + str([fn for fn in os.listdir("./generef/") if fn.endswith(".fa") or fn.endswith(".fasta")][0])
+REF = os.path.splitext(os.path.basename(fapath))[0]
+if fapath.endswith("fasta"):
+  os.rename(fapath, f"./generef/{REF}.fa")
+
+# rename gtf/gff files to be same as fasta file
+if config['annotation'] == 'gtf':
+  gtf = f"{DATAPATH}/generef/" + str([fn for fn in os.listdir("./generef/") if fn.endswith(".gtf")][0])
+  os.rename(gtf, f"./generef/{REF}.gtf")
+else:
+  gff = f"{DATAPATH}/generef/" + str([fn for fn in os.listdir("./generef/") if fn.endswith(".gff3")][0])
+  os.rename(gff, f"./generef/{REF}.gff3")
+
+# set orgnism from config (eukaryote or prokaryote)
+ORG = config['organism']
+
+# set strandedness from config
+if config['stranded']:
+    STRAND = 'stranded'
+else:
+    STRAND = 'unstranded'
+
+##### rule all input files #####
+ruleallfiles = [expand("generef/indices/{ref}_rsem.log", ref=REF),
+                expand("generef/indices/{ref}_star.log", ref=REF),
+                expand("01_fastqc/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
+                expand("01_fastqc/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS),
+                expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+                expand("02_trimmomatic/{sample}_{read}.se.fastq.gz", sample=SAMPLES, read=READS),
+                "02_trimmomatic/trimlog.txt",
+                expand("01_fastqc/trimmed/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
+                expand("01_fastqc/trimmed/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS),
+                expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES),
+                expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),
+                expand("04_STAR/{sample}.Log.final.out", sample=SAMPLES),
+                expand("04_STAR/{sample}.SJ.out.tab", sample=SAMPLES),
+                expand("04_STAR/tmp/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),
+                expand("05_RSEM/{sample}.Aligned.toTranscriptome.sortedByCoord.out.bam", sample=SAMPLES),
+                expand("05_RSEM/{sample}.genes.results", sample=SAMPLES),
+                expand("05_RSEM/{sample}.isoforms.results", sample=SAMPLES),
+                expand("05_RSEM/{sample}.Quant.pdf", sample=SAMPLES),
+                expand("06_qualimap/{sample}.report.pdf", sample=SAMPLES)]
+sortfiles = [expand("03_sortmeRNA/aligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+            expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+            expand("01_fastqc/filtered/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
+            expand("01_fastqc/filtered/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS)]
+
+##### load rules #####
+include: "rules/common.smk"
+include: "rules/fastqc.smk"
+include: "rules/trim.smk"
+include: "rules/rsem.smk"
+include: "rules/star.smk"
+include: "rules/refrsem.smk"
+include: "rules/refstar.smk"
+include: "rules/trimqc.smk"
+include: "rules/qualimap.smk"
+
+if config['sortmeRNA']:
+  ruleallfiles.extend(sortfiles)
+  include: "rules/rrna.smk"
+
+rule all:
+    input:
+      ruleallfiles
