@@ -7,8 +7,10 @@ rule rrna:
         un = expand("03_sortmeRNA/unaligned/{sample}", sample=SAMPLES),
         sample = SAMPLES
     output:
-        aligned = expand("03_sortmeRNA/aligned/{sample}_{read}.fastq", sample=SAMPLES, read=READS),
-        unaligned = expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq", sample=SAMPLES, read=READS)
+        alfwd = expand("03_sortmeRNA/aligned/{sample}_fwd.fq.gz", sample=SAMPLES),
+        alrev = expand("03_sortmeRNA/aligned/{sample}_rev.fq.gz", sample=SAMPLES),
+        unfwd = expand("03_sortmeRNA/unaligned/{sample}_fwd.fq.gz", sample=SAMPLES),
+        unrev = expand("03_sortmeRNA/unaligned/{sample}_rev.fq.gz", sample=SAMPLES)
     log:
         expand("03_sortmeRNA/log/{sample}.rrna.log", sample=SAMPLES)
     run:
@@ -34,7 +36,7 @@ rule rrna:
                     --workdir 03_sortmeRNA \
                     --aligned {aligned} \
                     --other {unaligned} \
-                    --fastx --paired_out True \
+                    --fastx -out2 \
                     2>&1 | tee -a {logN}
                     rm -rf 03_sortmeRNA/kvdb
                     '''
@@ -53,18 +55,32 @@ rule rrna:
                     '''
                     )
 
-rule gzip:
+rule rename:
     input:
-        aligned = expand("03_sortmeRNA/aligned/{sample}_{read}.fastq", sample=SAMPLES, read=READS),
-        unaligned = expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq", sample=SAMPLES, read=READS)
+        alfwd = expand("03_sortmeRNA/aligned/{sample}_fwd.fq.gz", sample=SAMPLES),
+        alrev = expand("03_sortmeRNA/aligned/{sample}_rev.fq.gz", sample=SAMPLES),
+        unfwd = expand("03_sortmeRNA/unaligned/{sample}_fwd.fq.gz", sample=SAMPLES),
+        unrev = expand("03_sortmeRNA/unaligned/{sample}_rev.fq.gz", sample=SAMPLES)
     output:
-        expand("03_sortmeRNA/aligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+        expand("03_sortmeRNA/aligned/{sample}_{read}.rrna.fastq.gz", sample=SAMPLES, read=READS),
         expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
-    shell:
-        '''
-        gzip {input.aligned}
-        gzip {input.unaligned}
-        '''
+    params:
+        path = ["03_sortmeRNA/aligned/", "03_sortmeRNA/unaligned/"]
+    run:
+        shell('echo "rRNA filtering completed, renaming files..."')
+        dat = []
+        for n in params.path:
+            dat.append(os.listdir(os.path.dirname(n)))
+        for files in dat[0]:
+            if files.endswith('_fwd.fq.gz'):
+                os.rename(params.path[0] + files, f"{params.path[0]}{files.split('_fwd')[0]}_1.rrna.fastq.gz")
+            elif files.endswith('_rev.fq.gz'):
+                os.rename(params.path[0] + files, f"{params.path[0]}{files.split('_rev')[0]}_2.rrna.fastq.gz")
+        for files in dat[1]:
+            if files.endswith('_fwd.fq.gz'):
+                os.rename(params.path[1] + files, f"{params.path[1]}{files.split('_fwd')[0]}_1.fastq.gz")
+            elif files.endswith('_rev.fq.gz'):
+                os.rename(params.path[1] + files, f"{params.path[1]}{files.split('_rev')[0]}_2.fastq.gz")
 
 rule rrnaqc:
     input:
@@ -75,9 +91,10 @@ rule rrnaqc:
     params:
         outdir = DATAPATH
     log: 
-        expand("01_fastqc/log/{sample}.trimqc.log", sample=SAMPLES, read=READS)
+        expand("01_fastqc/filtered/log/filteredqc.log", sample=SAMPLES, read=READS)
     shell: 
         '''
+        echo "Running fastqc on filtered files..."
         mkdir -p 01_fastqc/filtered/
         mkdir -p 01_fastqc/filtered/log
         echo 'fastqc Version:' 2>&1 | tee -a {log}

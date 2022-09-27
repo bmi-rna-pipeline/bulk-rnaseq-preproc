@@ -103,3 +103,7 @@ Snakemake 실행
         # or run one rule of pipeline
         snakemake rsem --cores 2 --rerun-incomplete
         ```
+
+Data source:
+
+[Mangkalaphiban K, He F, Ganesan R, Wu C et al. Transcriptome-wide investigation of stop codon readthrough in Saccharomyces cerevisiae. PLoS Genet 2021 Apr;17(4):e1009538. PMID: 33878104](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE162780)
