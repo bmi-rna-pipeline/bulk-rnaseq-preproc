@@ -86,6 +86,9 @@ rule rsem:
                     )
 
 rule plot:
+    input:
+        expand("05_RSEM/{sample}.genes.results", sample=SAMPLES),
+        expand("05_RSEM/{sample}.isoforms.results", sample=SAMPLES)
     output:
         expand("05_RSEM/{sample}.Quant.pdf", sample=SAMPLES)
     params:
