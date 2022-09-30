@@ -2,7 +2,15 @@
 
 #### Setup
 0. Download
+    - 도커 컨테이너가 없는 경우, 만들어준다.
+    ```bash
+    docker run -it --memory="512G" --cpus=128 --name [본인이름_컨테이너명] bmi_rnaseq_preproc:version2
+    ```
+
     - Github에서 sample data와 reference를 다운받는다.
+    ```
+    svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/sample-data
+    ```
     
 1. Data setup
     - “data” 폴더를 보면 샘플 데이터가 포함되어 있다.
@@ -38,7 +46,7 @@
 
 3. Config 파일 setup
     - config.yaml 파일을 확인해, 수정할 항목을 수정하여 저장한다 (chmod으로 권한 수정을 해야할수도 있다).
-        - stranded: True or False로 설정 (투토리얼 샘플 데이터는 True)
+        - stranded: True or False로 설정 (투토리얼 샘플 데이터는 True).
         - sortmeRNA: True or False로 설정. rRNA를 제거해야 하는 경우 True로 설정해준다.
             - 투토리얼에서는 True로 설정하여 직접 해보면 좋지만, 오래 걸리기 때문에 만약 시간이 부족하면 False로 설정해도 된다.
         - rRNApath: sortmerna가 있는 폴더의 absolute path를 지정해준다.
@@ -99,6 +107,3 @@ Snakemake 실행
         snakemake rsem --cores 2 --rerun-incomplete
         ```
 
-Data source:
-
-[Mangkalaphiban K, He F, Ganesan R, Wu C et al. Transcriptome-wide investigation of stop codon readthrough in Saccharomyces cerevisiae. PLoS Genet 2021 Apr;17(4):e1009538. PMID: 33878104](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE162780)
