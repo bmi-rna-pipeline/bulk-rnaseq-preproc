@@ -3,7 +3,14 @@ if config['organism'] == 'EUK':
 else:
     addparams = config['PRO']
 
+if config['sortmeRNA']:
+    starinput = expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
+else:
+    starinput = expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
+
 rule star:
+    input:
+        starinput
     output:
         expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES),
         expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),

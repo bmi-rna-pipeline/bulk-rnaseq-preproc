@@ -5,20 +5,10 @@ def getSample():
     targets = list()
     if ENDS == "PE":
         for n in range(0, len(SAMPLES)):
-            targets.append(f"data/{SAMPLES[n]}_1.fastq.gz data/{SAMPLES[n]}_2.fastq.gz")
+            targets.append(f"{DATAPATH}/data/{SAMPLES[n]}_1.fastq.gz {DATAPATH}/data/{SAMPLES[n]}_2.fastq.gz")
     else:
         for n in range(0, len(SAMPLES)):
-            targets.append(f"data/{SAMPLES[n]}_SE.fastq.gz")
-    return targets
-
-def trimOut():
-    targets = list()
-    if ENDS == "PE":
-        for n in range(0, len(SAMPLES)):
-            targets.append(f"02_trimmomatic/{SAMPLES[n]}_1.fastq.gz 02_trimmomatic/{SAMPLES[n]}_1.se.fastq.gz 02_trimmomatic/{SAMPLES[n]}_2.fastq.gz 02_trimmomatic/{SAMPLES[n]}_2.se.fastq.gz")
-    else:
-        for n in range(0, len(SAMPLES)):
-            targets.append(f"02_trimmomatic/{SAMPLES[n]}_SE.fastq.gz")
+            targets.append(f"{DATAPATH}/data/{SAMPLES[n]}_SE.fastq.gz")
     return targets
 
 def readsSample():
@@ -30,13 +20,6 @@ def readsSample():
         for n in range(0, len(SAMPLES)):
             targets.append(f" --reads {DATAPATH}/02_trimmomatic/{SAMPLES[n]}_SE.fastq.gz")
     return targets
-
-def searchdb(path):
-    dbfiles = list()
-    DB = [f for f in os.listdir(path) if isfile(join(path, f))]
-    for i in range(0, len(DB)):
-        dbfiles.append(f"{path}/{DB[i]}")
-    return dbfiles
 
 def getRef():
     targets = list()

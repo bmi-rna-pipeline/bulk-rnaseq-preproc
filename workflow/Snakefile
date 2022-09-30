@@ -71,7 +71,6 @@ ruleallfiles = [expand("generef/indices/{ref}_rsem.log", ref=REF),
                 expand("01_fastqc/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS),
                 expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
                 expand("02_trimmomatic/{sample}_{read}.se.fastq.gz", sample=SAMPLES, read=READS),
-                "02_trimmomatic/trimlog.txt",
                 expand("01_fastqc/trimmed/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
                 expand("01_fastqc/trimmed/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS),
                 expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES),
@@ -86,8 +85,8 @@ ruleallfiles = [expand("generef/indices/{ref}_rsem.log", ref=REF),
                 expand("06_qualimap/{sample}.namesort.bam", sample=SAMPLES),
                 expand("06_qualimap/{sample}.namesort.reheader.bam", sample=SAMPLES),
                 expand("06_qualimap/{sample}.report.pdf", sample=SAMPLES)]
-sortfiles = [expand("03_sortmeRNA/aligned/{sample}_{read}.rrna.fastq.gz", sample=SAMPLES, read=READS),
-            expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+sortfiles = [expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+            expand("03_sortmeRNA/{sample}_{read}.rRNA.fastq.gz", sample=SAMPLES, read=READS),
             expand("01_fastqc/filtered/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
             expand("01_fastqc/filtered/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS)]
 

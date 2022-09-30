@@ -41,18 +41,13 @@
         - stranded: True or False로 설정 (투토리얼 샘플 데이터는 True)
         - sortmeRNA: True or False로 설정. rRNA를 제거해야 하는 경우 True로 설정해준다.
             - 투토리얼에서는 True로 설정하여 직접 해보면 좋지만, 오래 걸리기 때문에 만약 시간이 부족하면 False로 설정해도 된다.
-        - rRNApath: rRNA database가 있는 폴더의 absolute path를 지정해준다.
-            - sortmeRNA가 False인 경우, 지정을 하지 않거나, #를 달아주어도 무관.
-            - rRNA database가 없는 경우 원하는 경로에 다운로드 후 config 파일에 경로 수정.
-                
-                ```bash
-                mkdir /home/rnadb
-                cd /home/rnadb
-                wget https://github.com/biocore/sortmerna/releases/download/v4.3.4/database.tar.gz
-                tar -xvf database.tar.gz
-                rm database.tar.gz
+        - rRNApath: sortmerna가 있는 폴더의 absolute path를 지정해준다.
+            - sortmeRNA가 어느 파일에 있는지 모를 경우 아래와 같이 확인한다.
+                ```
+                which sortmerna
                 ```
 
+            - sortmeRNA가 False인 경우, 지정을 하지 않거나, #를 달아주어도 무관.
         - annotation: 가지고 있는 annotation 파일 확장자에 따라 gtf 또는 gff 둘 중 하나로 수정해준다. 투토리얼에서는 annotation파일이 gtf 파일이므로 gtf로 되어있음을 확인한다.
         - organism: Eukaryote면 EUK, prokaryote면 PRO라고 해준다. 투토리얼 샘플 데이터는 eukaryote이므로 EUK로 되어있음을 확인한다.
         - adapter: adapter명을 필요대로 수정해준다. 투토리얼에서는 “TruSeq3-PE.fa:2:30:10”으로 되어있음을 확인한다.

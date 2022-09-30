@@ -64,23 +64,9 @@
         |	|  ...
         |
         └── generef
-        |	|  reference.fa
-        |	|  reference.gtf
-        |	|
-        |
-        └── rrnadb (optional)
-        	| 
-        	| ...
-        ```
-        
-    - sortmeRNA를 돌려야하는 경우, 원하는 경로에 rRNA database를 다운받아, config파일에서 rRNApath를 수정한다.
-        
-        ```bash
-        mkdir rrnadb
-        cd rrnadb
-        wget https://github.com/biocore/sortmerna/releases/download/v4.3.4/database.tar.gz
-        tar zcf database.tar.gz
-        rm database.tar.gz
+        	|  reference.fa
+        	|  reference.gtf
+        	|
         ```
 
 
@@ -93,7 +79,7 @@
     - sortmeRNA: rrna 필터링을 할지에 따라 True 또는 False로 설정.
         - False로 설정 후 rrna 필터링을 하려고 하면 오류가 난다.
         - 분석 진행 중 rrna 필터링이 필요하다고 생각되면 config 파일을 수정 후 rrna rule을 실행하면 된다.
-        - rRNApath는 rRNA database 폴더의 full path를 적어준다.
+        - rRNApath는 sortmerna 폴더의 full path를 적어준다 (default는 /sortmerna-2.1b).
     - organism: EUK 또는 PRO로 설정
         - Eukaryote면 EUK, prokaryote면 PRO로 지정한다.
         - STAR의 설정이 organism 값에 맞춰 바뀐다. 세부적 파라미터는 직접 수정 필요.

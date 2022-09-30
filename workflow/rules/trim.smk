@@ -1,55 +1,59 @@
-adaptertype = config['adapter']
-
 rule trim:
+    input:
+        expand("data/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
     output:
-        PE1 = expand("02_trimmomatic/{sample}_1.fastq.gz", sample=SAMPLES),
-        SE1 = expand("02_trimmomatic/{sample}_1.se.fastq.gz", sample=SAMPLES),
-        PE2 = expand("02_trimmomatic/{sample}_2.fastq.gz", sample=SAMPLES),
-        SE2 = expand("02_trimmomatic/{sample}_2.se.fastq.gz", sample=SAMPLES),
-        seOUT = expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
-        trimlog = "02_trimmomatic/trimlog.txt"
+        expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+        expand("02_trimmomatic/{sample}_{read}.se.fastq.gz", sample=SAMPLES, read=READS)
     params:
         nthread = THREADS,
         ends = ENDS,
-        adapter = adaptertype
+        ad = config['adapter'],
+        op = config['options'],
+        P1 = expand("{path}/02_trimmomatic/{sample}_1.fastq.gz", sample=SAMPLES, path=DATAPATH),
+        U1 = expand("{path}/02_trimmomatic/{sample}_1.se.fastq.gz", sample=SAMPLES, path=DATAPATH),
+        P2 = expand("{path}/02_trimmomatic/{sample}_2.fastq.gz", sample=SAMPLES, path=DATAPATH),
+        U2 = expand("{path}/02_trimmomatic/{sample}_2.se.fastq.gz", sample=SAMPLES, path=DATAPATH),
+        SE = expand("{path}/02_trimmomatic/{sample}_SE.fastq.gz", sample=SAMPLES, read=READS, path=DATAPATH)
     log:
-        out = expand("02_trimmomatic/log/trim.out.log"),
+        out = expand("02_trimmomatic/log/{sample}.log", sample=SAMPLES),
         trimlog = expand("02_trimmomatic/log/{sample}.trimlog.txt", sample=SAMPLES)
     run:
+        shell('''
+            mkdir -p 02_trimmomatic
+            mkdir -p 02_trimmomatic/log
+            echo "Trimmomatic Version:" 2>&1 | tee -a {log.out}
+            java -Xmx4g -jar /Trimmomatic-0.39/trimmomatic-0.39.jar -version 2>&1 | tee -a {log.out}
+            echo "Running trimmomatic for {ENDS} reads..." 2>&1 | tee -a {log.out}
+            ''')
         for i in range(0, len(SAMPLES)):
             inparams = getSample()[i]
-            outparams = trimOut()[i]
-            log = log.trimlog[i]
-            options = config['options']
-            shell('''
-                mkdir -p 02_trimmomatic
-                mkdir -p 02_trimmomatic/log
-                echo "Trimmomatic Version:" 2>&1 | tee -a {log.out}
-                java -Xmx4g -jar /Trimmomatic-0.39/trimmomatic-0.39.jar -version 2>&1 | tee -a {log.out}
-                echo "Running trimmomatic for {params.ends} reads..." 2>&1 | tee -a {log.out}
-                ''')
+            outparams = f'{params.P1[i]} {params.U1[i]} {params.P2[i]} {params.U2[i]}'
+            SEoutparams = params.SE[i]
+            trimlog = log.trimlog[i]
+            outlog = log.out[i]
             if ENDS == 'PE':
                 shell(
                     '''
                     java -Xmx4g -jar /Trimmomatic-0.39/trimmomatic-0.39.jar \
-                    {params.ends} -threads {params.nthread} \
-                    -trimlog {log} \
+                    PE -threads {params.nthread} \
                     {inparams} \
                     {outparams} \
-                    {params.adapter} \
-                    {options} 2>&1 | tee -a {log.out}
+                    {params.ad} \
+                    {params.op} \
+                    -trimlog {trimlog} \
+                    2>&1 | tee -a {outlog}
                     '''
                     )
             else:
                 shell(
                     '''
                     java -Xmx4g -jar /Trimmomatic-0.39/trimmomatic-0.39.jar \
-                    {params.ends} -threads {params.nthread} \
-                    -trimlog {log} \
+                    SE -threads {params.nthread} \
                     {inparams} \
-                    {outparams} \
-                    {params.adapter} \
-                    {options} 2>&1 | tee -a {log.out}
+                    {SEoutparams} \
+                    {params.ad} \
+                    {params.op} \
+                    -trimlog {trimlog} 2>&1 | tee -a {outlog}
                     '''
                     )
 
@@ -60,15 +64,21 @@ rule trimqc:
         expand("01_fastqc/trimmed/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
         expand("01_fastqc/trimmed/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS)
     params:
-        outdir = DATAPATH
+        outdir = f"{DATAPATH}/01_fastqc/trimmed",
+        qc1 = expand("02_trimmomatic/{sample}_1.fastq.gz", sample=SAMPLES),
+        qc2 = expand("02_trimmomatic/{sample}_2.fastq.gz", sample=SAMPLES)
     log: 
-        expand("01_fastqc/log/{sample}.trimqc.log", sample=SAMPLES, read=READS)
-    shell: 
-        '''
-        mkdir -p 01_fastqc/trimmed/
-        mkdir -p 01_fastqc/trimmed/log
-        echo 'fastqc Version:' 2>&1 | tee -a {log}
-        fastqc --version  2>&1 | tee -a {log}
-        echo Running fastqc on raw files... 2>&1 | tee -a {log}
-        fastqc {input} --outdir {params.outdir}/01_fastqc/trimmed 2>&1 | tee -a {log}
-        '''
+        expand("01_fastqc/log/{sample}.trimmed.log", sample=SAMPLES)
+    run:
+        for i in range(0, len(SAMPLES)):
+            inparams = f'{params.qc1[i]} {params.qc2[i]}'
+            logN = log[i]
+            shell(
+                '''
+                mkdir -p 01_fastqc
+                mkdir -p 01_fastqc/trimmed
+                echo 'fastqc Version:' 2>&1 | tee -a {logN}
+                fastqc --version  2>&1 | tee -a {logN}
+                echo Running fastqc on trimmed files... 2>&1 | tee -a {logN}
+                fastqc {inparams} --outdir {params.outdir} 2>&1 | tee -a {logN}
+                ''')

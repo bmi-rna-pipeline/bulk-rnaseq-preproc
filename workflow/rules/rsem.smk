@@ -1,102 +1,102 @@
-rule pre:
+if config['organism'] == 'EUK':
+    addparams = config['EUK']
+else:
+    addparams = config['PRO']
+
+if config['sortmeRNA']:
+    starinput = expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
+else:
+    starinput = expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
+
+rule star:
     input:
-        tmpfile = expand("04_STAR/tmp/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES)
+        starinput
     output:
-        outfile = expand("05_RSEM/{sample}.Aligned.toTranscriptome.sortedByCoord.out.bam", sample=SAMPLES)
+        expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES),
+        expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),
+        expand("04_STAR/{sample}.Log.final.out", sample=SAMPLES),
+        expand("04_STAR/{sample}.SJ.out.tab", sample=SAMPLES)
+    log:
+        expand("04_STAR/log/star.log", sample=SAMPLES)
     params:
+        vals = config['STAR'],
+        add = addparams,
+        ends = ENDS,
+        org = ORG,
+        out = expand("./04_STAR/{sample}.", sample=SAMPLES),
         nthread = THREADS
     run:
         for i in range(0, len(SAMPLES)):
-            inparams = input.tmpfile[i]
-            outparams = output.outfile[i]
-            if ENDS == 'PE':
+            inparams = starIn()[i]
+            outparams = params.out[i]
+            shell(
+                '''
+                mkdir -p 04_STAR
+                mkdir -p 04_STAR/log
+                touch {log}
+                echo "STAR Version:" 2>&1 | tee -a {log}
+                STAR --version 2>&1 | tee -a {log}
+                echo "Running STAR for {params.ends} reads..." 2>&1 | tee -a {log}
+                echo "STAR parameters set for organism = {params.org}: {params.vals} {params.add}" 2>&1 | tee -a {log}
+                '''
+                )
+            if ENDS == "PE":
                 shell(
                     '''
-                    cat <( samtools view -H {inparams} ) <( samtools view -@ {params.nthread} {inparams} | awk '{{printf "%s", $0 " "; getline; print}}' | sort -S 50G -T 05_RSEM/tmp | tr " " "\n" ) | samtools view -@ {params.nthread} -bS - > {outparams}
+                    STAR \
+                    --genomeDir ./generef/indices/ \
+                    --readFilesIn {inparams} \
+                    --outSAMunmapped Within \
+                    {params.vals} \
+                    {params.add} \
+                    --readFilesCommand zcat \
+                    --outFileNamePrefix {outparams} \
+                    --runThreadN {params.nthread} \
+                    --genomeLoad LoadAndKeep \
+                    --limitBAMsortRAM 50000000000 \
+                    --outSAMtype BAM SortedByCoordinate \
+                    --quantMode TranscriptomeSAM \
+                    --outSAMheaderCommentFile commentsENCODElong.txt \
+                    --outSAMheaderHD @HD VN:1.4 SO:coordinate 2>&1 | tee -a {log}
                     '''
                     )
             else:
                 shell(
                     '''
-                    cat <( samtools view -H {inparams} ) <( samtools view -@ {params.nthread} {inparams} | sort -S 50G -T 05_RSEM/tmp ) | samtools view -@ {params.nthread} -bS - > {outparams}
+                    STAR \
+                    --genomeDir ./generef/indices/ \
+                    --readFilesIn {inparams} \
+                    --outSAMunmapped Within \
+                    {params.vals} \
+                    {params.add} \
+                    --readFilesCommand zcat \
+                    --outFileNamePrefix {outparams} \
+                    --runThreadN {params.nthread} \
+                    --genomeLoad LoadAndKeep \
+                    --limitBAMsortRAM 50000000000 \
+                    --outSAMtype BAM SortedByCoordinate \
+                    --quantMode TranscriptomeSAM \
+                    --outSAMstrandField intronMotif \
+                    --outSAMheaderCommentFile commentsENCODElong.txt \
+                    --outSAMheaderHD @HD VN:1.4 SO:coordinate 2>&1 | tee -a {log}
                     '''
                     )
 
-rule rsem:
+rule cptmp:
     input:
-        files = expand("05_RSEM/{sample}.Aligned.toTranscriptome.sortedByCoord.out.bam", sample=SAMPLES)
+        cp = expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES)
     output:
-        expand("05_RSEM/{sample}.genes.results", sample=SAMPLES),
-        expand("05_RSEM/{sample}.isoforms.results", sample=SAMPLES)
-    params:
-        ends = ENDS,
-        org = ORG,
-        strand = STRAND,
-        prefix = expand("05_RSEM/{sample}", sample=SAMPLES),
-        nthread = THREADS, 
-        ref = REF
-    log:
-        expand("05_RSEM/log/rsem.log", sample=SAMPLES)
+        tmpfile = expand("04_STAR/tmp/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES)
     run:
         shell(
             '''
-            mkdir -p 05_RSEM/log
-            echo 'RSEM Version:' 2>&1 | tee -a {log}
-            rsem-calculate-expression --version 2>&1 | tee -a {log}
-            echo 'Running RSEM for {params.strand} {params.ends} reads...' 2>&1 | tee -a {log}
+            mkdir -p 04_STAR/tmp
             '''
             )
         for i in range(0, len(SAMPLES)):
-            inparams = input.files[i]
-            pref = params.prefix[i]
-            if config['stranded']:
-                shell(
-                    '''
-                    rsem-calculate-expression \
-                    --bam \
-                    --estimate-rspd \
-                    --calc-ci \
-                    --no-bam-output \
-                    --seed 12345 \
-                    -p {params.nthread} \
-                    --ci-memory 30000 \
-                    --paired-end \
-                    --strandedness reverse \
-                    {inparams} \
-                    ./generef/indices/{params.ref}_rsem \
-                    {pref} 2>&1 | tee -a {log}
-                    '''
-                    )
-            else:
-                shell(
-                    '''
-                    rsem-calculate-expression \
-                    --bam \
-                    --estimate-rspd \
-                    --calc-ci \
-                    --no-bam-output \
-                    --seed 12345 \
-                    -p {params.nthread} \
-                    --ci-memory 30000 \
-                    --paired-end \
-                    {inparams} \
-                    ./generef/indices/{params.ref}_rsem \
-                    {pref} 2>&1 | tee -a {log}
-                    '''
-                    )
-
-rule plot:
-    input:
-        expand("05_RSEM/{sample}.genes.results", sample=SAMPLES),
-        expand("05_RSEM/{sample}.isoforms.results", sample=SAMPLES)
-    output:
-        expand("05_RSEM/{sample}.Quant.pdf", sample=SAMPLES)
-    params:
-        prefix = expand("05_RSEM/{sample}", sample=SAMPLES)
-    log:
-        expand("05_RSEM/log/rsem.log", sample=SAMPLES)
-    run:
-        for i in range(0, len(SAMPLES)):
-            pref = params.prefix[i]
-            plot = output[i]
-            shell('rsem-plot-model {pref} {plot} >> {log} 2>&1')
+            inparams = input.cp[i]
+            tmp = output.tmpfile[i]
+            shell(
+                '''
+                cp {inparams} {tmp}
+                ''')

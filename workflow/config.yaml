@@ -17,8 +17,8 @@ stranded: True
 
 # 'True' to run sortmeRNA
 sortmeRNA: True
-# rRNA database path
-rRNApath: /home/rnadb
+# sortmeRNA path
+rRNApath: /sortmerna-2.1b
 
 # gtf or gff file
 annotation: gtf

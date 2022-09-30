@@ -1,104 +1,188 @@
-ref = searchdb(config['rRNApath'])
-refparams = getRef()
+ref = config['rRNApath']
 
-rule rrna:
+rule sort:
+    input:
+        expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
     params:
-        al = expand("03_sortmeRNA/aligned/{sample}", sample=SAMPLES),
-        un = expand("03_sortmeRNA/unaligned/{sample}", sample=SAMPLES),
-        sample = SAMPLES
+        PE1 = expand("02_trimmomatic/{sample}_1.fastq.gz", sample=SAMPLES),
+        PE2 = expand("02_trimmomatic/{sample}_2.fastq.gz", sample=SAMPLES),
+        tmp1 = expand("03_sortmeRNA/tmp/{sample}_1.fastq.gz", sample=SAMPLES, read=READS),
+        tmp2 = expand("03_sortmeRNA/tmp/{sample}_2.fastq.gz", sample=SAMPLES, read=READS),
+        mtmp = expand("03_sortmeRNA/tmp/{sample}_merged.fastq.gz", sample=SAMPLES)
     output:
-        alfwd = expand("03_sortmeRNA/aligned/{sample}_fwd.fq.gz", sample=SAMPLES),
-        alrev = expand("03_sortmeRNA/aligned/{sample}_rev.fq.gz", sample=SAMPLES),
-        unfwd = expand("03_sortmeRNA/unaligned/{sample}_fwd.fq.gz", sample=SAMPLES),
-        unrev = expand("03_sortmeRNA/unaligned/{sample}_rev.fq.gz", sample=SAMPLES)
+        expand("03_sortmeRNA/tmp/{sample}_merged.fastq.gz", sample=SAMPLES)
     log:
         expand("03_sortmeRNA/log/{sample}.rrna.log", sample=SAMPLES)
     run:
         for i in range(0, len(SAMPLES)):
-            readparams = readsSample()[i]
-            sampleN = params.sample[i]
-            aligned = params.al[i]
-            unaligned = params.un[i]
+            inreads1 = params.PE1[i]
+            inreads2 = params.PE2[i]
+            sereads = input[i]
+            intmp1 = params.tmp1[i]
+            intmp2 = params.tmp2[i]
+            merged = params.mtmp[i]
             logN = log[i]
             shell('''
                 mkdir -p 03_sortmeRNA
                 mkdir -p 03_sortmeRNA/log
-                echo 'sortmeRNA Version:' 2>&1 | tee -a {log}
-                sortmerna --version 2>&1 | tee -a {log}
-                echo 'Running sortmeRNA for {ENDS} reads: {sampleN}'
+                mkdir -p 03_sortmeRNA/tmp
+                echo 'merging into tmp files...' 2>&1 | tee -a {logN}
                 ''')
             if ENDS == 'PE':
                 shell(
                     '''
-                    sortmerna \
-                    {refparams} \
-                    {readparams} \
-                    --workdir 03_sortmeRNA \
-                    --aligned {aligned} \
-                    --other {unaligned} \
-                    --fastx -out2 \
-                    2>&1 | tee -a {logN}
-                    rm -rf 03_sortmeRNA/kvdb
+                    zcat {inreads1} > {intmp1}
+                    zcat {inreads2} > {intmp2}
+                    {ref}/scripts/merge-paired-reads.sh \
+                    {intmp1} {intmp2} {merged} 2>&1 | tee -a {logN}
                     '''
                     )
             else:
                 shell(
                     '''
-                    sortmerna \
-                    {refparams} \
-                    {readparams} \
-                    --workdir 03_sortmeRNA \
-                    --aligned {aligned} \
-                    --other {unaligned} \
-                    --fastx 2>&1 | tee -a {logN}
-                    rm -rf 03_sortmeRNA/kvdb
+                    cp {sereads} {merged}
                     '''
                     )
 
-rule rename:
+rule rrna:
     input:
-        alfwd = expand("03_sortmeRNA/aligned/{sample}_fwd.fq.gz", sample=SAMPLES),
-        alrev = expand("03_sortmeRNA/aligned/{sample}_rev.fq.gz", sample=SAMPLES),
-        unfwd = expand("03_sortmeRNA/unaligned/{sample}_fwd.fq.gz", sample=SAMPLES),
-        unrev = expand("03_sortmeRNA/unaligned/{sample}_rev.fq.gz", sample=SAMPLES)
-    output:
-        expand("03_sortmeRNA/aligned/{sample}_{read}.rrna.fastq.gz", sample=SAMPLES, read=READS),
-        expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
+        merged = expand("03_sortmeRNA/tmp/{sample}_merged.fastq.gz", sample=SAMPLES)
     params:
-        path = ["03_sortmeRNA/aligned/", "03_sortmeRNA/unaligned/"]
+        pref = expand("03_sortmeRNA/{sample}_rRNA.tmp", sample=SAMPLES),
+        filtered = expand("03_sortmeRNA/{sample}_filtered.tmp", sample=SAMPLES),
+        nthread = THREADS
+    output:
+        expand("03_sortmeRNA/{sample}_rRNA.tmp.fq", sample=SAMPLES),
+        expand("03_sortmeRNA/{sample}_filtered.tmp.fq", sample=SAMPLES)
+    log:
+        expand("03_sortmeRNA/log/{sample}.rrna.log", sample=SAMPLES)
     run:
-        shell('echo "rRNA filtering completed, renaming files..."')
-        dat = []
-        for n in params.path:
-            dat.append(os.listdir(os.path.dirname(n)))
-        for files in dat[0]:
-            if files.endswith('_fwd.fq.gz'):
-                os.rename(params.path[0] + files, f"{params.path[0]}{files.split('_fwd')[0]}_1.rrna.fastq.gz")
-            elif files.endswith('_rev.fq.gz'):
-                os.rename(params.path[0] + files, f"{params.path[0]}{files.split('_rev')[0]}_2.rrna.fastq.gz")
-        for files in dat[1]:
-            if files.endswith('_fwd.fq.gz'):
-                os.rename(params.path[1] + files, f"{params.path[1]}{files.split('_fwd')[0]}_1.fastq.gz")
-            elif files.endswith('_rev.fq.gz'):
-                os.rename(params.path[1] + files, f"{params.path[1]}{files.split('_rev')[0]}_2.fastq.gz")
+        for i in range(0, len(SAMPLES)):
+            merged = input.merged[i]
+            prefix = params.pref[i]
+            prefixF = params.filtered[i]
+            logN = log[i]
+            shell('''
+                echo 'Running sortmeRNA for {ENDS} reads...' 2>&1 | tee -a {logN}
+                sortmerna --ref {ref}/rRNA_databases/silva-bac-16s-id90.fasta,{ref}/index/silva-bac-16s-db:{ref}/rRNA_databases/silva-bac-23s-id98.fasta,{ref}/index/silva-bac-23s-db:{ref}/rRNA_databases/silva-arc-16s-id95.fasta,{ref}/index/silva-arc-16s-db:{ref}/rRNA_databases/silva-arc-23s-id98.fasta,{ref}/index/silva-arc-23s-db:{ref}/rRNA_databases/silva-euk-18s-id95.fasta,{ref}/index/silva-euk-18s-db:{ref}/rRNA_databases/silva-euk-28s-id98.fasta,{ref}/index/silva-euk-28s:{ref}/rRNA_databases/rfam-5s-database-id98.fasta,{ref}/index/rfam-5s-db:{ref}/rRNA_databases/rfam-5.8s-database-id98.fasta,{ref}/index/rfam-5.8s-db \
+                --reads {merged} --fastx \
+                --aligned {prefix} --other {prefixF} \
+                --log -v --paired-in True -a {params.nthread} 2>&1 | tee -a {logN}
+                '''
+                )
+
+rule clean:
+    input:
+        rrna = expand("03_sortmeRNA/{sample}_rRNA.tmp.fq", sample=SAMPLES),
+        filtered = expand("03_sortmeRNA/{sample}_filtered.tmp.fq", sample=SAMPLES)
+    output:
+        rrnav = expand("03_sortmeRNA/{sample}_rRNA.tmp.verified.fq", sample=SAMPLES),
+        filtv = expand("03_sortmeRNA/{sample}_filtered.tmp.verified.fq", sample=SAMPLES)
+    params:
+        pref = expand("03_sortmeRNA/{sample}_rRNA.tmp", sample=SAMPLES),
+        filtered = expand("03_sortmeRNA/{sample}_filtered.tmp", sample=SAMPLES)
+    log:
+        expand("03_sortmeRNA/log/{sample}.rrna.log", sample=SAMPLES)
+    run:
+        for i in range(0, len(SAMPLES)):
+            inrrna = input.rrna[i]
+            infilt = input.filtered[i]
+            out = output.rrnav[i]
+            outf = output.filtv[i]
+            logN = log[i]
+            shell('''
+                grep -v -e '^$' {infilt} > {out} 2>&1 | tee -a {logN}
+                grep -v -e '^$' {inrrna} > {outf} 2>&1 | tee -a {logN}
+                rm {infilt} {inrrna} 2>&1 | tee -a {logN}
+                ''')
+
+rule unmerge:
+    input:
+        tmp1 = expand("03_sortmeRNA/{sample}_rRNA.tmp.verified.fq", sample=SAMPLES),
+        tmp2 = expand("03_sortmeRNA/{sample}_filtered.tmp.verified.fq", sample=SAMPLES)
+    output:
+        expand("03_sortmeRNA/{sample}_{read}.fastq", sample=SAMPLES, read=READS),
+        expand("03_sortmeRNA/{sample}_{read}.rRNA.fastq", sample=SAMPLES, read=READS)
+    params:
+        filtered1 = expand("03_sortmeRNA/{sample}_1.fastq", sample=SAMPLES),
+        filtered2 = expand("03_sortmeRNA/{sample}_2.fastq", sample=SAMPLES),
+        rRNA1 = expand("03_sortmeRNA/{sample}_1.rRNA.fastq", sample=SAMPLES),
+        rRNA2 = expand("03_sortmeRNA/{sample}_2.rRNA.fastq", sample=SAMPLES)
+    log:
+        expand("03_sortmeRNA/log/{sample}.rrna.log", sample=SAMPLES)
+    run:
+        for i in range(0, len(SAMPLES)):
+            intmp1 = input.tmp1[i]
+            intmp2 = input.tmp2[i]
+            outf1 = params.filtered1[i]
+            outf2 = params.filtered2[i]
+            outR1 = params.rRNA1[i]
+            outR2 = params.rRNA2[i]
+            logN = log[i]
+            if ENDS == 'PE':
+                shell('''
+                    echo "unmerging PE reads..." 2>&1 | tee -a {logN}
+                    {ref}/scripts/unmerge-paired-reads.sh {intmp2} {outf1} {outf2} 2>&1 | tee -a {logN}
+                    {ref}/scripts/unmerge-paired-reads.sh {intmp1} {outR1} {outR2} 2>&1 | tee -a {logN}
+                    ''')
+            else:
+                shell('''
+                    echo "renaming SE reads..." 2>&1 | tee -a {logN}
+                    rename "s/_rRNA.tmp.verified.fq/.rRNA.fastq/" *.fq
+                    rename "s/_filtered.tmp.verified.fq/.fastq/" *.fq
+                    ''')
+            shell('''
+                echo "removing tmp files..." 2>&1 | tee -a {logN}
+                rm {intmp1} 2>&1 | tee -a {logN}
+                rm {intmp2} 2>&1 | tee -a {logN}
+                ''')
+
+rule gzip:
+    input:
+        expand("03_sortmeRNA/{sample}_{read}.fastq", sample=SAMPLES, read=READS),
+        expand("03_sortmeRNA/{sample}_{read}.rRNA.fastq", sample=SAMPLES, read=READS)
+    output:
+        expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
+        expand("03_sortmeRNA/{sample}_{read}.rRNA.fastq.gz", sample=SAMPLES, read=READS)
+    params:
+        tmp = "03_sortmeRNA/tmp/",
+        sN = expand("{sample}", sample=SAMPLES)
+    log:
+        expand("03_sortmeRNA/log/{sample}.rrna.log", sample=SAMPLES)
+    run:
+        for i in range(0, len(SAMPLES)):
+            logN = log[i]
+            sampleN = params.sN[i]
+            shell(
+                '''
+                echo "finalizing files..." 2>&1 | tee -a {logN}
+                gzip {input} 2>&1 | tee -a {logN}
+                rm -rf {params.tmp} 2>&1 | tee -a {logN}
+                echo "sortmerna finished for {sampleN}" 2>&1 | tee -a {logN}
+                ''')
 
 rule rrnaqc:
     input:
-        expand("03_sortmeRNA/unaligned/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
+        expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
     output:
         expand("01_fastqc/filtered/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
         expand("01_fastqc/filtered/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS)
     params:
-        outdir = DATAPATH
+        outdir = f"{DATAPATH}/01_fastqc/filtered",
+        qc1 = expand("03_sortmeRNA/{sample}_1.fastq.gz", sample=SAMPLES),
+        qc2 = expand("03_sortmeRNA/{sample}_2.fastq.gz", sample=SAMPLES)
     log: 
-        expand("01_fastqc/filtered/log/filteredqc.log", sample=SAMPLES, read=READS)
-    shell: 
-        '''
-        echo "Running fastqc on filtered files..."
-        mkdir -p 01_fastqc/filtered/
-        mkdir -p 01_fastqc/filtered/log
-        echo 'fastqc Version:' 2>&1 | tee -a {log}
-        fastqc --version  2>&1 | tee -a {log}
-        echo Running fastqc on raw files... 2>&1 | tee -a {log}
-        fastqc {input} --outdir {params.outdir}/01_fastqc/filtered 2>&1 | tee -a {log}
-        '''
+        expand("01_fastqc/log/{sample}.filtered.log", sample=SAMPLES)
+    run:
+        for i in range(0, len(SAMPLES)):
+            inparams = f'{params.qc1[i]} {params.qc2[i]}'
+            logN = log[i]
+            shell(
+                '''
+                mkdir -p 01_fastqc
+                mkdir -p 01_fastqc/filtered
+                echo 'fastqc Version:' 2>&1 | tee -a {logN}
+                fastqc --version  2>&1 | tee -a {logN}
+                echo Running fastqc on filtered files... 2>&1 | tee -a {logN}
+                fastqc {inparams} --outdir {params.outdir} 2>&1 | tee -a {logN}
+                ''')

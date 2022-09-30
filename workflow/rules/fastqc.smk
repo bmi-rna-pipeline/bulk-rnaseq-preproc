@@ -7,7 +7,7 @@ rule fastqc:
     params:
         outdir = DATAPATH
     log: 
-        expand("01_fastqc/log/{sample}.fastqc.log", sample=SAMPLES, read=READS)
+        expand("01_fastqc/log/{{sample}}.fastqc.log", read=READS)
     shell: 
         '''
         mkdir -p 01_fastqc
