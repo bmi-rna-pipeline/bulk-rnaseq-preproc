@@ -137,6 +137,8 @@
     snakemake --cores 2 --rerun-incomplete
     ```
 
+[샘플 데이터를 전처리 해보는 간단한 tutorial](https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/wiki/Tutorial-with-Sample-Data)
+
 ### Snakemake 과정
 
 #### Rules 실행 순서
