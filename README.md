@@ -15,10 +15,10 @@
     - Snakemake 파일들을 다운받고 unzip한다.
         
         ```bash
-        svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/workflow
+        svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/wkdir
         ```
         
-    - ‘SnakemakeFiles’ 폴더명을 원하는데로 수정할 수 있지만, SnakemakeFiles내의 폴더명 (data, generef, workflow)은 유지한다.
+    - ‘’ 폴더명을 원하는데로 수정할 수 있지만, SnakemakeFiles내의 폴더명 (data, generef, workflow)은 유지한다.
     - data 폴더에 전처리할 fastq파일을 저장하면 된다. {sample ID}_{read number}.fastq.gz 또는 {sample ID}_{read number}.fq.gz 로 되어있어야 snakemake가 돌아가기 때문에 수정해야한다면 해야한다.
         - PE의 경우: sample1_1.fastq.gz, sample1_2.fastq.gz와 비슷한 형식
             - 예시: sample_001.fq.gz파일을  sample_1.fq.gz로 바꿔준다
