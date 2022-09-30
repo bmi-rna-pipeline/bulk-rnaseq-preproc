@@ -104,6 +104,11 @@
         - rrna 필터링을 True로 하는 경우에는 rule all input에 sortmeRNA output 파일이 추가된다.
 
 #### Snakemake 실행
+- conda environment를 activate한다.
+    ```bash
+    conda activate bmipreproc
+    ```
+    
 - Working directory에 cd가 되어있는 것을 확인 후 진행한다.
 - 일단 dry run을 실행해본다. Dry run은 실제로 돌아가는 것이 아니기 때문에 dry run이 된다고 해도 파이프라인 전체가 된다는 보장은 아니다.
     
