@@ -1,2 +1,2 @@
 
-Sample data can be found at [sample-data.tar](https://www.dropbox.com/s/1qhbkbb4s96kip2/sample-data.tar).
+Sample data can be found at [sample-data.tar.gz](https://www.dropbox.com/s/695b6dh232vnfnj/sample-data.tar.gz).
