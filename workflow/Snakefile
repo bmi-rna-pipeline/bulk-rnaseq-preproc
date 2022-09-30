@@ -14,7 +14,7 @@ THREADS = config['threads']
 
 # get working directory path
 DATAPATH = os.getcwd()
-filecnt = len(os.listdir("./data/"))
+filecnt = len([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")])
 
 # get names and path of fastq/fq files
 fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")][i]) for i in range(0, filecnt)]
