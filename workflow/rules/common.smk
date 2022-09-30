@@ -21,6 +21,13 @@ def readsSample():
             targets.append(f" --reads {DATAPATH}/02_trimmomatic/{SAMPLES[n]}_SE.fastq.gz")
     return targets
 
+def searchdb(path):
+    dbfiles = list()
+    DB = [f for f in os.listdir(path) if isfile(join(path, f))]
+    for i in range(0, len(DB)):
+        dbfiles.append(f"{path}/{DB[i]}")
+    return dbfiles
+
 def getRef():
     targets = list()
     for n in range(0, len(ref)):

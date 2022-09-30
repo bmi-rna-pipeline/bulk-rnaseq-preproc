@@ -15,7 +15,7 @@
     - Snakemake 파일들을 다운받고 unzip한다.
         
         ```bash
-        
+        svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/workflow
         ```
         
     - ‘SnakemakeFiles’ 폴더명을 원하는데로 수정할 수 있지만, SnakemakeFiles내의 폴더명 (data, generef, workflow)은 유지한다.
@@ -66,7 +66,7 @@
         └── generef
         	|  reference.fa
         	|  reference.gtf
-        	|
+        	|  ...
         ```
 
 
