@@ -8,7 +8,7 @@
     - 도커 이미지로 도커 컨테이너를 만들어준다
     
         ```bash
-        docker run -it --memory="512G" --cpus=128 --name [본인이름_컨테이너명] bmi_rnaseq_preproc:version2
+        docker run -it --memory="512G" --cpus=128 --name [본인이름_컨테이너명] snuhbmi/preproc
         ```
     
 2. Snakemake directory preparation
