@@ -12,13 +12,17 @@
         ```
     
 2. Snakemake directory preparation
-    - Snakemake 파일들을 다운받고 unzip한다.
+    - Working directory로 사용할 폴더에 cd를 한 후, data와 generef 파일을 만들어준다.
+        ```bash
+        mkdir data generef
+        ```
+    - Working directory에 snakemake 파일들을 다운받고 unzip한다.
         
         ```bash
-        svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/wkdir
+        svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/workflow
         ```
         
-    - ‘wkdir’ 폴더명을 원하는데로 수정할 수 있지만, wkdir내의 폴더명 (data, generef, workflow)은 유지한다.
+    - Working directody의 폴더명은 원하는데로 수정할 수 있지만, 그 외의 폴더명 (data, generef, workflow)은 유지한다.
     - data 폴더에 전처리할 fastq파일을 저장하면 된다. {sample ID}\_{read number}.fastq.gz 또는 {sample ID}\_{read number}.fq.gz 로 되어있어야 snakemake가 돌아가기 때문에 수정해야한다면 해야한다.
         - PE의 경우: sample1_1.fastq.gz, sample1_2.fastq.gz와 비슷한 형식
             - 예시: sample_001.fq.gz파일을  sample_1.fq.gz로 바꿔준다
