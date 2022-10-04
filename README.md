@@ -83,7 +83,8 @@
     - sortmeRNA: rrna 필터링을 할지에 따라 True 또는 False로 설정.
         - False로 설정 후 rrna 필터링을 하려고 하면 오류가 난다.
         - 분석 진행 중 rrna 필터링이 필요하다고 생각되면 config 파일을 수정 후 rrna rule을 실행하면 된다.
-        - rRNApath는 sortmerna 폴더의 full path를 적어준다 (default는 /sortmerna-2.1b).
+        - rRNApath는 sortmerna 폴더의 full path를 적어준다 (default는 /sortmerna-2.1b). 
+          주의사항: sortmerna를 진행 전에 한번은 index를 만들어주어야 한다. ([Tutorial의 Config 파일 setup 부분 참고](https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/wiki/Tutorial-with-Sample-Data))
     - organism: EUK 또는 PRO로 설정
         - Eukaryote면 EUK, prokaryote면 PRO로 지정한다.
         - STAR의 설정이 organism 값에 맞춰 바뀐다. 세부적 파라미터는 직접 수정 필요.
@@ -102,7 +103,7 @@
         - ENDS는 data 파일에 {SAMPLES}_2.fq.gz 파일이 존재하면 “PE”, _SE.fq.gz와 같은 파일이 존재하면 “SE”로 설정된다.
         - READS는 ENDS의 값이 “PE”면 1과 2로 설정되고, “SE”면 SE로 설정된다.
         - REF은 fasta파일의 이름으로 설정된다. (gtf/gff 파일 이름이 fasta파일과 같은 이름으로 자동으로 수정된다.)
-        - STRAND는 config.yaml 파일을 통해 설정한다..
+        - STRAND는 config.yaml 파일을 통해 설정한다.
         - ORG는 config.yaml에서 EUK 또는 PRO로 설정한다.
     - Snakefile의 rule all input들은 최종적으로 나올 모든 rule들의 output file 이름들이다.
         - rrna 필터링을 True로 하는 경우에는 rule all input에 sortmeRNA output 파일이 추가된다.
