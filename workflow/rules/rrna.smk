@@ -1,6 +1,6 @@
 ref = config['rRNApath']
 
-checkpoint touch:
+rule touch:
     input:
         expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
     output:
@@ -10,7 +10,7 @@ checkpoint touch:
         touch {input}
         """
 
-checkpoint sort:
+rule sort:
     input:
         expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
     params:
@@ -91,7 +91,7 @@ rule rrna:
                     '''
                     )
 
-checkpoint clean:
+rule clean:
     input:
         rrna = expand("03_sortmeRNA/{sample}_rRNA.tmp.fq.gz", sample=SAMPLES),
         filtered = expand("03_sortmeRNA/{sample}_filtered.tmp.fq.gz", sample=SAMPLES)
@@ -113,7 +113,7 @@ checkpoint clean:
                 rm {infilt} {inrrna} 2>&1 | tee -a {logN}
                 ''')
 
-checkpoint unmerge:
+rule unmerge:
     input:
         tmp1 = expand("03_sortmeRNA/{sample}_rRNA.tmp.verified.fq.gz", sample=SAMPLES),
         tmp2 = expand("03_sortmeRNA/{sample}_filtered.tmp.verified.fq.gz", sample=SAMPLES)
