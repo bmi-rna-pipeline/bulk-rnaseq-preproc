@@ -59,7 +59,7 @@ rule rsem:
                     --no-bam-output \
                     --seed 12345 \
                     -p {params.nthread} \
-                    --ci-memory 30000 \
+                    --ci-memory 6000 \
                     --paired-end \
                     --strandedness reverse \
                     {inparams} \
@@ -77,7 +77,7 @@ rule rsem:
                     --no-bam-output \
                     --seed 12345 \
                     -p {params.nthread} \
-                    --ci-memory 30000 \
+                    --ci-memory 6000 \
                     --paired-end \
                     {inparams} \
                     ./generef/indices/{params.ref}_rsem \

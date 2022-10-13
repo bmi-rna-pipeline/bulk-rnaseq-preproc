@@ -2,8 +2,8 @@ rule trim:
     input:
         expand("data/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
     output:
-        expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
-        expand("02_trimmomatic/{sample}_{read}.se.fastq.gz", sample=SAMPLES, read=READS)
+        protected(expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)),
+        protected(expand("02_trimmomatic/{sample}_{read}.se.fastq.gz", sample=SAMPLES, read=READS))
     params:
         nthread = THREADS,
         ends = ENDS,
