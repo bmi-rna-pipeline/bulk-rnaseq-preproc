@@ -12,10 +12,10 @@ rule star:
     input:
         starinput
     output:
-        expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES),
-        expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),
-        expand("04_STAR/{sample}.Log.final.out", sample=SAMPLES),
-        expand("04_STAR/{sample}.SJ.out.tab", sample=SAMPLES)
+        protected(expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES)),
+        protected(expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES)),
+        protected(expand("04_STAR/{sample}.Log.final.out", sample=SAMPLES)),
+        protected(expand("04_STAR/{sample}.SJ.out.tab", sample=SAMPLES))
     log:
         expand("04_STAR/log/star.log", sample=SAMPLES)
     params:
