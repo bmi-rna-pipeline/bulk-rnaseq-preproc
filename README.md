@@ -5,9 +5,10 @@
 
 #### Getting Started
 1. Environment Setup
-    - 147 서버에 있는 도커 이미지로 도커 컨테이너를 만들어준다
+    - 이미지로 도커 컨테이너를 만들어준다. 사용하는 서버에 snuhbmi/preproc 이미지가 없으면 docker pull을 먼저 해준다.
     
         ```bash
+        docker pull snuhbmi/preproc
         docker run -it --memory="512G" --cpus=128 --name [본인이름_컨테이너명] snuhbmi/preproc
         ```
     
@@ -142,9 +143,9 @@
     snakemake --cores 2 --rerun-incomplete
     ```
 
-- 만약 파이프라인의 스크립트 일부를 수정후 중간부터 진행해야 한다면, 그 전 파일들을 touch로 업데이트 해준다. 안 그러면 이미 진행한 rule이 다시 진행 될 수 있다.
+- 만약 파이프라인의 스크립트 일부를 수정후 중간부터 진행해야 한다면, 파일들을 --cleanup-metadata로 업데이트 해준다. 안 그러면 이미 진행한 rule이 다시 진행 될 수 있다.
     ```bash
-    snakemake rsem --touch --cores 2
+    snakemake --cleanup-metadata 02_trimmomatic/* --rerun-triggers mtime --cores 2
     ```
 
 [샘플 데이터를 전처리 해보는 간단한 tutorial](https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/wiki/Tutorial-with-Sample-Data)

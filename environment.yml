@@ -1,13 +1,17 @@
 name: bmipreproc
 channels:
+  - conda-forge
   - bioconda
   - anaconda
-  - conda-forge
   - defaults
 dependencies:
   - snakemake
   - star
   - rsem
   - python=3.7
+  - conda-forge::ncurses
+  - htseq
+  - trim-galore
+  - bioconda::samtools
 
 prefix: /opt/conda/envs/bmipreproc
