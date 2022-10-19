@@ -9,32 +9,33 @@ import re
 import glob
 
 configfile: "workflow/config.yaml"
+configfile: "workflow/params.yaml"
 
 # set number of threads to use from config
 THREADS = config['threads']
 
 # get working directory path
 DATAPATH = os.getcwd()
-filecnt = len([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")])
+if config['gzip']:
+  filecnt = len([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")])
+else:
+  filecnt = len([fn for fn in os.listdir("./data/") if fn.endswith(".fq") or fn.endswith(".fastq")])
 
 # get names and path of fastq/fq files
-fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")][i]) for i in range(0, filecnt)]
+if config['gzip']:
+  fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")][i]) for i in range(0, filecnt)]
+else:
+  fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq") or fn.endswith(".fastq")][i]) for i in range(0, filecnt)]
 
 # rename if fq.gz -> fastq.gz
 samplefull = [os.path.splitext(os.path.basename(fqpath[i]))[0].split('.')[0] for i in range(0, len(fqpath))] # full names of the samples incl reads
 for i in range(0, len(fqpath)):
   if fqpath[i].endswith("fq.gz"):
     os.rename(fqpath[i], f"./data/{samplefull[i]}.fastq.gz")
+  if fqpath[i].endswith("fq"):
+    os.rename(fqpath[i], f"./data/{samplefull[i]}.fastq")
 
-# determine if pe or se data and set reads
-for i in range(0, len(fqpath)):
-  for word in fqpath[i].split('.fastq.gz'):
-    if word.endswith('_2'):
-      ENDS = "PE"
-    elif word.endswith('_SE'):
-      ENDS = "SE"
-
-if ENDS == "PE":
+if config['ends'] == 'PE':
   READS = ["1", "2"]
 else:
   READS = "SE"
