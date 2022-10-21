@@ -86,18 +86,18 @@
     - 기존에 있는 툴 외의 툴 사용시 https://github.com/bmi-rna-pipeline/snakemake-wrappers 에서 wrapper를 사용/수정/제작해서 rule을 만들 수 있다.
 
 #### Snakemake 실행
+- conda environment를 activate한다.
+    ```bash
+    conda activate bmipreproc
+    ```
+ 
+ - Working directory에 cd가 되어있는 것을 확인 후 진행한다.
  - Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
     ```bash
     python ./scripts/ref.py
     python ./scripts/sample-sheet.py
     ```
-  
-- conda environment를 activate한다.
-    ```bash
-    conda activate bmipreproc
-    ```
-    
-- Working directory에 cd가 되어있는 것을 확인 후 진행한다.
+
 - 일단 dry run을 실행해본다. Dry run은 실제로 돌아가는 것이 아니기 때문에 dry run이 된다고 해도 파이프라인 전체가 된다는 보장은 아니다.
     
     ```bash
