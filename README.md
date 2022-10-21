@@ -25,7 +25,7 @@
         ```
         
     - Working directory의 폴더명은 원하는데로 수정할 수 있지만, 그 외의 폴더명 (data, genome, workflow)은 유지한다.
-    - data 폴더에 전처리할 fastq파일을 저장하면 된다. {sample ID}\_{read number} 또는 {sample ID}\_{read number} 로 되어있어야 snakemake가 돌아가기 때문에 수정이 필요하면 한다.
+    - data 폴더에 전처리할 fastq파일을 저장하면 된다. {sample ID}\_{read number} 또는 SE의 경우 {sample ID}로 되어있어야 snakemake가 돌아가기 때문에 수정이 필요하면 한다.
         - PE의 경우: sample1_1.fastq, sample1_2.fastq.gz와 비슷한 형식
             - 예시: sample_001.fq.gz파일을  sample_1.fq.gz로 바꿔준다
                 
