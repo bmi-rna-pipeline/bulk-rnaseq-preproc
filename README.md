@@ -74,10 +74,6 @@
         	|  ...
         ```
 
-#### Script 실행
- - Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
-    - 
-
 #### Configuration
 - Configuration 설정
     - Snakefile 자체의 파라미터는 config 파일 위쪽 설정들을 수정
@@ -90,6 +86,12 @@
     - 기존에 있는 툴 외의 툴 사용시 https://github.com/bmi-rna-pipeline/snakemake-wrappers 에서 wrapper를 사용/수정/제작해서 rule을 만들 수 있다.
 
 #### Snakemake 실행
+ - Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
+    ```bash
+    python ./scripts/ref.py
+    python ./scripts/sample-sheet.py
+    ```
+  
 - conda environment를 activate한다.
     ```bash
     conda activate bmipreproc
