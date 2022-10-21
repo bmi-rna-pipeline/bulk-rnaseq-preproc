@@ -1,12 +1,8 @@
-rule trimpe:
+rule trimse:
     input:
-        r1 = "data/{sample}_1.{ext}",
-        r2 = "data/{sample}_2.{ext}"
+        "data/{sample}.{ext}"
     output:
-        r1 = "trimmed/{sample}_1.{ext}",
-        r2 = "trimmed/{sample}_2.{ext}",
-        r1_unpaired = "trimmed/{sample}_1.se.{ext}",
-        r2_unpaired = "trimmed/{sample}_2.se.{ext}"
+        "trimmed/{sample}.{ext}",
     message:
         shell('''
         echo Trimmomatic version:
@@ -22,4 +18,4 @@ rule trimpe:
         compression_level="-9"
     threads: config['threads']
     wrapper:
-        "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/trimmomatic/pe"
+        "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/trimmomatic/se"

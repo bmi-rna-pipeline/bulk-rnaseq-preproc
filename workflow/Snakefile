@@ -7,14 +7,24 @@ min_version("6.4.1")
 configfile: "workflow/config.yaml"
 configfile: "workflow/tools.yaml"
 
+
 include: "rules/common.smk"
-include: "rules/fastqc.smk"
-include: "rules/trimPE.smk"
-include: "rules/starindex.smk"
-include: "rules/star.smk"
-include: "rules/sam.smk"
-include: "rules/rsemindex.smk"
-include: "rules/rsem.smk"
+if config['qc']['fastqc']:
+    include: "rules/fastqc.smk"
+
+if config['align']['star']:
+    include: "rules/starindex.smk"
+    include: "rules/star.smk"
+    include: "rules/sam.smk"
+
+if config['quant']['rsem']:
+    include: "rules/rsemindex.smk"
+    include: "rules/rsem.smk"
+
+if config['trim']['trimmomatic'] and config['ends'] == 'PE':
+    include: "rules/trimPE.smk"
+elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
+    include: "rules/trimSE.smk"
 
 rule all:
     input:
