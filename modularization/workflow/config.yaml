@@ -1,0 +1,28 @@
+---
+snakefile: Snakefile
+cores: 8
+latency-wait: 60
+reason: True
+show-failed-logs: True
+keep-going: True
+printshellcmds: True
+rerun-incomplete: True
+restart-times: 3
+
+# Threads to utilize
+threads: 8
+
+# 'True' if stranded, 'False' if unstranded.
+# ends 'PE' if paired end, 'SE' if single end
+stranded: True
+ends: PE
+
+# 'True' if gzipped files, 'False' if unzipped
+gzip: False
+
+# 'True' to run sortmeRNA
+sortmeRNA: True
+# sortmeRNA path
+rRNApath: /sortmerna-2.1b
+samples: config/samples.csv
+genome: config/genome.csv
