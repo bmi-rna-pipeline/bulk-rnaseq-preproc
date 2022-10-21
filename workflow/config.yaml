@@ -17,11 +17,6 @@ threads: 8
 stranded: True
 ends: PE
 
-# 'True' to run sortmeRNA
-sortmeRNA: True
-# sortmeRNA path
-rRNApath: /sortmerna-2.1b
-
 # path or URL to sample sheet (CSV format, columns: sample, condition, ...)
 samples: config/samples.csv
 genome: config/genome.csv
