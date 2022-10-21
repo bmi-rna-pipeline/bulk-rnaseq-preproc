@@ -118,8 +118,7 @@
 ### Snakemake 과정
 
 #### Rules 실행 순서
-- Bulk RNA-Seq 전처리의 흐름대로 실행된다고 보면 되지만, 필요한 파일이 존재하면 동시에 여러 rule이 진행될 수 있다.
-    - 예시: fastq 파일을 사용하는 rules, fastqc와 trim 둘이 동시에 실행될 수 있다. Raw 파일의 quality control report를 먼저 보고 trimming을 하고 싶으면, fastqc 룰을 개별로 먼저 진행한 후 나머지는 진행해도 좋다.
+- Bulk RNA-Seq 전처리의 흐름대로 실행된다고 보면 되지만, 필요한 파일이 존재하면 동시에 여러 rule이 진행될 수 있다. 순서는 개별 rule을 사용해서 바꿀 수 있고, 혹은 rule에 `priority: 1` 등 지정해줄 수 있다.
 
         ```bash
         # run fastqc rule independently
