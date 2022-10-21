@@ -75,7 +75,7 @@
         ```
 
 #### Script 실행
-- Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
+ - Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
     - 
 
 #### Configuration
