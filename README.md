@@ -130,13 +130,12 @@
 #### Rules 실행 순서
 - Bulk RNA-Seq 전처리의 흐름대로 실행된다고 보면 되지만, 필요한 파일이 존재하면 동시에 여러 rule이 진행될 수 있다. 순서는 개별 rule을 사용해서 바꿀 수 있고, 혹은 rule에 `priority: 1` 등 지정해줄 수 있다.
 
-        ```bash
         # run fastqc rule independently
         snakemake fastqc --cores 2
 
         # run everything else
         snakemake --cores 2 --rerun-incomplete
-        ```
+
 
 #### Snakemake rules의 원리
 - Snakemake는 각 rule의 output file들이 존재하지 않으면, 그 rule을 실행하여 output files가 만들어지도록 진행되는 과정이다.
