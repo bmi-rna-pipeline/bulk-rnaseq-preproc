@@ -47,13 +47,18 @@
         ```
         Working Directory
         |
+        |
+        └── scripts
+        |	|  ref.py
+        |	|  sample-sheet.py
+        |
         └── workflow
         |	|  Snakefile
         |	|  config.yaml
         |	|  
         |	└── rules
         |		|  fastqc.smk
-        |		|  trim.smk
+        |		|  trimPE.smk
         |		|  star.smk
         |		|  ...
         |
@@ -69,6 +74,9 @@
         	|  ...
         ```
 
+#### Script 실행
+- Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
+    - 
 
 #### Configuration
 - Configuration 설정
