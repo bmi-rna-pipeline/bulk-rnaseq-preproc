@@ -17,9 +17,6 @@ threads: 8
 stranded: True
 ends: PE
 
-# 'True' if gzipped files, 'False' if unzipped
-gzip: False
-
 # 'True' to run sortmeRNA
 sortmeRNA: True
 # sortmeRNA path
