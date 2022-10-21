@@ -25,8 +25,7 @@ sortmeRNA: True
 # sortmeRNA path
 rRNApath: /sortmerna-2.1b
 
-# gtf or gff file
-annotation: gtf
-
-# EUK if eukaryote, PRO if prokaryote
-organism: EUK
+# path or URL to sample sheet (CSV format, columns: sample, condition, ...)
+samples: config/samples.csv
+genome: config/genome.csv
+extension: fastq

@@ -8,10 +8,9 @@ dependencies:
   - snakemake
   - star
   - rsem
-  - python=3.7
+  - trimmomatic
+  - python=3.10
   - conda-forge::ncurses
-  - htseq
-  - trim-galore
   - bioconda::samtools
 
 prefix: /opt/conda/envs/bmipreproc

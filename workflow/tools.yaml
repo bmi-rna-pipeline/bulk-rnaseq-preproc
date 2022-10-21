@@ -1,0 +1,19 @@
+# tools
+index:
+  priority: 1
+
+qc:
+  fastqc: True
+  priority: 2
+
+trim:
+  trimmomatic: True
+  priority: 3
+
+align:
+  star: True
+  priority: 4
+
+quant:
+  rsem: True
+  priority: 5

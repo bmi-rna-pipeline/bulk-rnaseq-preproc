@@ -1,87 +1,55 @@
-if config['organism'] == 'EUK':
-    addparams = config['EUK']
-else:
-    addparams = config['PRO']
-
-if config['sortmeRNA']:
-    if config['gzip']:
-        starinput = expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
-    else:
-        starinput = expand("03_sortmeRNA/{sample}_{read}.fastq", sample=SAMPLES, read=READS)
-else:
-    if config['gzip']:
-        starinput = expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS)
-    else:
-        starinput = expand("02_trimmomatic/{sample}_{read}.fastq", sample=SAMPLES, read=READS)
-
-rule star:
+rule star_pe_multi:
     input:
-        starinput
+        # use a list for multiple fastq files for one sample
+        # usually technical replicates across lanes/flowcells
+        fq1=["trimmed/{sample}_1.fastq", "trimmed/{sample}_2.fastq"],
+        # path to STAR reference genome index
+        idx="genome/starindex",
     output:
-        protected(expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES)),
-        protected(expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES)),
-        protected(expand("04_STAR/{sample}.Log.final.out", sample=SAMPLES)),
-        protected(expand("04_STAR/{sample}.SJ.out.tab", sample=SAMPLES))
+        # see STAR manual for additional output files
+        aln="star/pe/{sample}.Aligned.sortedByCoord.out.bam",
+        trn="star/pe/{sample}.Aligned.toTranscriptome.out.bam",
+        log="star/pe/{sample}.Log.out",
+        sj="star/pe/{sample}.SJ.out.tab",
+        log_final="star/pe/{sample}/Log.final.out",
+    message:
+        shell('''
+            echo STAR version:
+            STAR --version
+            ''')
     log:
-        expand("04_STAR/log/star.log", sample=SAMPLES)
+        "star/pe/logs/{sample}.log",
     params:
-        vals = config['STAR'],
-        add = addparams,
-        ends = config['PE'],
-        gz = config['SE']
-        org = ORG,
-        out = expand("./04_STAR/{sample}.", sample=SAMPLES),
-        nthread = THREADS
-    run:
-        shell(
-            '''
-            mkdir -p 04_STAR
-            mkdir -p 04_STAR/log
-            touch {log}
-            echo "STAR Version:" 2>&1 | tee -a {log}
-            STAR --version 2>&1 | tee -a {log}
-            echo "Running STAR for {params.ends} reads..." 2>&1 | tee -a {log}
-            echo "STAR parameters set for organism = {params.org}: {params.vals} {params.add}" 2>&1 | tee -a {log}
-            '''
-            )
-        if ENDS == "PE":
-            shell(
-                '''
-                STAR \
-                --genomeDir ./generef/indices/ \
-                --readFilesIn {input} \
-                --outSAMunmapped Within \
-                {params.vals} \
-                {params.add} \
-                {params.gz} \
-                --outFileNamePrefix {params.out} \
-                --runThreadN {params.nthread} \
-                --genomeLoad LoadAndKeep \
-                --limitBAMsortRAM 50000000000 \
-                --outSAMtype BAM SortedByCoordinate \
-                --quantMode TranscriptomeSAM \
-                --outSAMheaderCommentFile commentsENCODElong.txt \
-                --outSAMheaderHD @HD VN:1.4 SO:coordinate 2>&1 | tee -a {log}
-                '''
-                )
-        else:
-            shell(
-                '''
-                STAR \
-                --genomeDir ./generef/indices/ \
-                --readFilesIn {input} \
-                --outSAMunmapped Within \
-                {params.vals} \
-                {params.add} \
-                {params.gz} \
-                --outFileNamePrefix {params.out} \
-                --runThreadN {params.nthread} \
-                --genomeLoad LoadAndKeep \
-                --limitBAMsortRAM 50000000000 \
-                --outSAMtype BAM SortedByCoordinate \
-                --quantMode TranscriptomeSAM \
-                --outSAMstrandField intronMotif \
-                --outSAMheaderCommentFile commentsENCODElong.txt \
-                --outSAMheaderHD @HD VN:1.4 SO:coordinate 2>&1 | tee -a {log}
-                '''
-                )
+        # optional parameters
+        extra="--outSAMtype BAM SortedByCoordinate",
+        quant="--quantMode TranscriptomeSAM",
+    threads: config['threads']
+    wrapper:
+        "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/star/align"
+
+
+rule star_se:
+    input:
+        fq1="trimmed/{sample}.fastq",
+        # path to STAR reference genome index
+        idx="genome/starindex",
+    output:
+        # see STAR manual for additional output files
+        aln="star/se/{sample}.Aligned.sortedByCoord.out.bam",
+        trn="star/se/{sample}.Aligned.toTranscriptome.out.bam",
+        log="star/se/{sample}/Log.out",
+        log_final="star/se/{sample}/Log.final.out",
+    message:
+        shell('''
+            echo STAR version:
+            STAR --version
+            ''')
+    log:
+        "star/se/logs/{sample}.log",
+    params:
+        # optional parameters
+        extra="--outSAMtype BAM SortedByCoordinate",
+        quant="--quantMode TranscriptomeSAM",
+    threads: config['threads']
+    wrapper:
+        "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/star/align"

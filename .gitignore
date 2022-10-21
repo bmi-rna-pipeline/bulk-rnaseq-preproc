@@ -349,7 +349,9 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# testignore
-*.test
 .tmp.drivedownload
 .tmp.driveupload
+.DS_Store
+
+# old files
+old/workflow/

@@ -7,6 +7,11 @@ rule trimpe:
         r2 = "trimmed/{sample}_2.{ext}",
         r1_unpaired = "trimmed/{sample}_1.se.{ext}",
         r2_unpaired = "trimmed/{sample}_2.se.{ext}"
+    message:
+        shell('''
+        echo Trimmomatic version:
+        trimmomatic -version
+        ''')
     log:
         "trimmed/log/{sample}.{ext}.log"
     params:

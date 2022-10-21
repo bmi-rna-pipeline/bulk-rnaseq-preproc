@@ -1,105 +1,21 @@
 from snakemake.utils import min_version
+import pandas as pd
 
 ##### set minimum snakemake version #####
 min_version("6.4.1")
 
-import pandas as pd
-import os
-import re
-import glob
-
 configfile: "workflow/config.yaml"
-configfile: "workflow/params.yaml"
+configfile: "workflow/tools.yaml"
 
-# set number of threads to use from config
-THREADS = config['threads']
-
-# get working directory path
-DATAPATH = os.getcwd()
-if config['gzip']:
-  filecnt = len([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")])
-else:
-  filecnt = len([fn for fn in os.listdir("./data/") if fn.endswith(".fq") or fn.endswith(".fastq")])
-
-# get names and path of fastq/fq files
-if config['gzip']:
-  fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq.gz") or fn.endswith(".fastq.gz")][i]) for i in range(0, filecnt)]
-else:
-  fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/") if fn.endswith(".fq") or fn.endswith(".fastq")][i]) for i in range(0, filecnt)]
-
-# rename if fq.gz -> fastq.gz
-samplefull = [os.path.splitext(os.path.basename(fqpath[i]))[0].split('.')[0] for i in range(0, len(fqpath))] # full names of the samples incl reads
-for i in range(0, len(fqpath)):
-  if fqpath[i].endswith("fq.gz"):
-    os.rename(fqpath[i], f"./data/{samplefull[i]}.fastq.gz")
-  if fqpath[i].endswith("fq"):
-    os.rename(fqpath[i], f"./data/{samplefull[i]}.fastq")
-
-if config['ends'] == 'PE':
-  READS = ["1", "2"]
-else:
-  READS = "SE"
-
-# get names of samples
-SAMPLES = list(set(['_'.join((samplefull[i].split('_'))[:-1]) for i in range(0, filecnt)]))
-
-# get fasta file name and rename if fasta -> fa
-fapath  = f"{DATAPATH}/generef/" + str([fn for fn in os.listdir("./generef/") if fn.endswith(".fa") or fn.endswith(".fasta")][0])
-REF = os.path.splitext(os.path.basename(fapath))[0]
-if fapath.endswith("fasta"):
-  os.rename(fapath, f"./generef/{REF}.fa")
-
-# set orgnism from config (eukaryote or prokaryote)
-ORG = config['organism']
-
-# set strandedness from config
-if config['stranded']:
-    STRAND = 'stranded'
-else:
-    STRAND = 'unstranded'
-
-##### rule all input files #####
-ruleallfiles = [expand("generef/{ref}.gtf", ref=REF),
-                expand("generef/indices/{ref}_rsem.log", ref=REF),
-                expand("generef/indices/{ref}_star.log", ref=REF),
-                expand("01_fastqc/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
-                expand("01_fastqc/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS),
-                expand("02_trimmomatic/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
-                expand("02_trimmomatic/{sample}_{read}.se.fastq.gz", sample=SAMPLES, read=READS),
-                expand("01_fastqc/trimmed/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
-                expand("01_fastqc/trimmed/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS),
-                expand("04_STAR/{sample}.Aligned.sortedByCoord.out.bam", sample=SAMPLES),
-                expand("04_STAR/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),
-                expand("04_STAR/{sample}.Log.final.out", sample=SAMPLES),
-                expand("04_STAR/{sample}.SJ.out.tab", sample=SAMPLES),
-                expand("04_STAR/tmp/{sample}.Aligned.toTranscriptome.out.bam", sample=SAMPLES),
-                expand("05_RSEM/{sample}.Aligned.toTranscriptome.sortedByCoord.out.bam", sample=SAMPLES),
-                expand("05_RSEM/{sample}.genes.results", sample=SAMPLES),
-                expand("05_RSEM/{sample}.isoforms.results", sample=SAMPLES),
-                expand("05_RSEM/{sample}.Quant.pdf", sample=SAMPLES),
-                expand("06_qualimap/{sample}.namesort.bam", sample=SAMPLES),
-                expand("06_qualimap/{sample}.namesort.reheader.bam", sample=SAMPLES),
-                expand("06_qualimap/{sample}.report.pdf", sample=SAMPLES)]
-sortfiles = [expand("03_sortmeRNA/{sample}_{read}.fastq.gz", sample=SAMPLES, read=READS),
-            expand("03_sortmeRNA/{sample}_{read}.rRNA.fastq.gz", sample=SAMPLES, read=READS),
-            expand("01_fastqc/filtered/{sample}_{read}_fastqc.html", sample=SAMPLES, read=READS),
-            expand("01_fastqc/filtered/{sample}_{read}_fastqc.zip", sample=SAMPLES, read=READS)]
-
-##### load rules #####
-include: "rules/gff.smk"
 include: "rules/common.smk"
 include: "rules/fastqc.smk"
-include: "rules/trim.smk"
-include: "rules/rsem.smk"
+include: "rules/trimPE.smk"
+include: "rules/starindex.smk"
 include: "rules/star.smk"
-include: "rules/refrsem.smk"
-include: "rules/refstar.smk"
-include: "rules/qualimap.smk"
-
-if config['sortmeRNA']:
-  ruleallfiles.extend(sortfiles)
-  include: "rules/rrna.smk"
+include: "rules/sam.smk"
+include: "rules/rsemindex.smk"
+include: "rules/rsem.smk"
 
 rule all:
     input:
-      ruleallfiles
+        all_input,

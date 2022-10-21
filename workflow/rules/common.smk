@@ -1,53 +1,106 @@
-import os
-from os.path import isfile, join, dirname, abspath
+from snakemake.utils import validate
+import pandas as pd
+import numpy as np
 
-def getSample():
-    targets = list()
-    if ENDS == "PE":
-        for n in range(0, len(SAMPLES)):
-            targets.append(f"{DATAPATH}/data/{SAMPLES[n]}_1.fastq.gz {DATAPATH}/data/{SAMPLES[n]}_2.fastq.gz")
+df = pd.read_csv(config['samples'], dtype='str').set_index(
+    ["sample_name", "reads", "fq"], drop=False)
+
+gdf = pd.read_csv(config['genome'], dtype='str').set_index(
+    ["name", "fa", "annot"], drop=False)
+
+SAMPLES = df.sample_name
+READS = df.reads
+FULL = df.fq
+EXT = config['extension']
+FASTA = gdf.fa
+GTF = gdf.annot
+NAME = gdf.name
+
+wildcard_constraints:
+    sample = "|".join(df.sample_name),
+    read = "|".join(df.reads),
+    full = "|".join(df.fq),
+    fasta = "|".join(gdf.fa),
+    ann = "|".join(gdf.annot),
+
+def is_single_end(sample, read):
+    """Determine whether single-end."""
+    fq2_not_present = df.loc[pd.isnull(df['reads'])]
+    return fq2_not_present["sample_name"]
+
+def get_fastqs(wildcards):
+    """Get raw FASTQ files from unit sheet."""
+    if is_single_end(wildcards.sample, wildcards.read) is not None:
+        return df.loc[(wildcards.sample, wildcards.read), "full"]
     else:
-        for n in range(0, len(SAMPLES)):
-            targets.append(f"{DATAPATH}/data/{SAMPLES[n]}_SE.fastq.gz")
-    return targets
+        for i in range(0, len(df)):
+            u = df.loc[(wildcards.sample, wildcards.read), ["full"]].dropna()
+            return [f"{u.fq[i]}", f"{u.fq[i + 1]}"]
 
-def readsSample():
-    targets = list()
-    if ENDS == "PE":
-        for n in range(0, len(SAMPLES)):
-            targets.append(f" --reads {DATAPATH}/02_trimmomatic/{SAMPLES[n]}_1.fastq.gz --reads {DATAPATH}/02_trimmomatic/{SAMPLES[n]}_2.fastq.gz")
-    else:
-        for n in range(0, len(SAMPLES)):
-            targets.append(f" --reads {DATAPATH}/02_trimmomatic/{SAMPLES[n]}_SE.fastq.gz")
-    return targets
+def all_input(wildcards):
+    """
+    Function defining all requested inputs for the rule all (below).
+    """
+    wanted_input = []
 
-def searchdb(path):
-    dbfiles = list()
-    DB = [f for f in os.listdir(path) if isfile(join(path, f))]
-    for i in range(0, len(DB)):
-        dbfiles.append(f"{path}/{DB[i]}")
-    return dbfiles
+    wanted_input.extend(
+            [directory("./genome/")]
+        )
 
-def getRef():
-    targets = list()
-    for n in range(0, len(ref)):
-        targets.append(f" --ref {ref[n]}")
-    return targets
+    if config['qc']['fastqc']:
+        wanted_input.extend(
+            expand(
+                ["fastqc/{id.sample_name}_{id.reads}_fastqc.html",
+                "fastqc/{id.sample_name}_{id.reads}_fastqc.zip"], 
+                id=df[['sample_name', 'reads']].itertuples()
+            )
+        )
 
-def starIn():
-    targets = list()
-    if config['sortmeRNA'] == True:
-        if ENDS == "PE":
-            for n in range(0, len(SAMPLES)):
-                targets.append(f"03_sortmeRNA/unaligned/{SAMPLES[n]}_1.fastq.gz 03_sortmeRNA/unaligned/{SAMPLES[n]}_2.fastq.gz")
-        else:
-            for n in range(0, len(SAMPLES)):
-                targets.append(f"03_sortmeRNA/unaligned/{SAMPLES[n]}_SE.fastq.gz")
-    else:
-        if ENDS == "PE":
-            for n in range(0, len(SAMPLES)):
-                targets.append(f"02_trimmomatic/{SAMPLES[n]}_1.fastq.gz 02_trimmomatic/{SAMPLES[n]}_2.fastq.gz")
-        else:
-            for n in range(0, len(SAMPLES)):
-                targets.append(f"02_trimmomatic/{SAMPLES[n]}_SE.fastq.gz")
-    return targets
+    if config['trim']['trimmomatic']:
+        wanted_input.extend(
+            expand(
+                ["trimmed/{id.sample_name}_{id.reads}.{ext}",
+                "trimmed/{id.sample_name}_{id.reads}.se.{ext}"], 
+                id=df[['sample_name', 'reads']].itertuples(), ext = config['extension']
+            )
+        )
+
+    if config['align']['star']:
+        wanted_input.extend(
+            [directory("genome/starindex/")]
+        )
+    
+    if config['align']['star'] and config['ends'] == 'PE':
+        wanted_input.extend(
+            expand(
+                ["star/pe/{id.sample_name}.Aligned.sortedByCoord.out.bam",
+                "star/pe/{id.sample_name}.Aligned.toTranscriptome.out.bam",
+                "star/pe/{id.sample_name}.Log.out",
+                "star/pe/{id.sample_name}.SJ.out.tab",
+                "star/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                id=df[['sample_name']].itertuples()
+            )
+        )
+    elif config['align']['star'] and config['ends'] == 'SE':
+        wanted_input.extend(
+            expand(
+                ["star/se/{id.sample_name}.Aligned.sortedByCoord.out.bam",
+                "star/se/{id.sample_name}.Aligned.toTranscriptome.out.bam",
+                "star/se/{id.sample_name}.Log.out",
+                "star/se/{id.sample_name}.SJ.out.tab",
+                "star/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                id=df[['sample_name']].itertuples()
+            )
+        )
+
+    if config['quant']['rsem']:
+        wanted_input.extend(
+            expand(
+                ["genome/rsemindex/{a.name}.seq",
+                "rsem/{id.sample_name}.genes.results",
+                "rsem/{id.sample_name}.isoforms.results"],
+                a=gdf[['name']].itertuples(), id=df[['sample_name']].itertuples()
+            )
+        )
+
+    return wanted_input
