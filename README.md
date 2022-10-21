@@ -13,7 +13,7 @@
         ```
     
 2. Snakemake directory preparation
-    - Working directory로 사용할 폴더에 cd를 한 후, data와 generef 파일을 만들어준다.
+    - Working directory로 사용할 폴더에 cd를 한 후, data와 genome 파일을 만들어준다.
         ```bash
         mkdir data genome
         ```
@@ -24,7 +24,7 @@
         svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/scripts
         ```
         
-    - Working directory의 폴더명은 원하는데로 수정할 수 있지만, 그 외의 폴더명 (data, generef, workflow)은 유지한다.
+    - Working directory의 폴더명은 원하는데로 수정할 수 있지만, 그 외의 폴더명 (data, genome, workflow)은 유지한다.
     - data 폴더에 전처리할 fastq파일을 저장하면 된다. {sample ID}\_{read number} 또는 {sample ID}\_{read number} 로 되어있어야 snakemake가 돌아가기 때문에 수정이 필요하면 한다.
         - PE의 경우: sample1_1.fastq, sample1_2.fastq.gz와 비슷한 형식
             - 예시: sample_001.fq.gz파일을  sample_1.fq.gz로 바꿔준다
@@ -37,7 +37,7 @@
         - SE의 경우: sample1.fq, sample2.fastq.gz와 비슷한 형식 (_1 또는 _2로 끝나지 않게끔 한다.)
         - 확장자를 확인 후 config 파일 수정
 
-    - generef 파일은 reference fasta파일과 gtf/gff파일이 넣어야 된다.
+    - genome 파일은 reference fasta파일과 gtf/gff파일이 넣어야 된다.
         - Fasta 파일은 .fa 또는 .fasta 확장자 파일 한개 (여러개일 경우 오류가 생긴다)
         - gtf/gff 파일은 .gtf 또는 .gff3 확장자 파일 한개 (여러개일 경우 오류가 생기고, gtf 또는 gff3중 하나여야한다. 파일 확장자에 따라 config 파일 수정 필요.)
         - Fasta와 gtf/gff 파일명은 무관 
