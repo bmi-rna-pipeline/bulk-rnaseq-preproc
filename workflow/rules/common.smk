@@ -56,12 +56,19 @@ def all_input(wildcards):
             )
         )
 
-    if config['trim']['trimmomatic']:
+    if config['trim']['trimmomatic'] and config['ends'] == 'PE':
         wanted_input.extend(
             expand(
                 ["trimmed/{id.sample_name}_{id.reads}.{ext}",
                 "trimmed/{id.sample_name}_{id.reads}.se.{ext}"], 
                 id=df[['sample_name', 'reads']].itertuples(), ext = config['extension']
+            )
+        )
+    elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
+        wanted_input.extend(
+            expand(
+                ["trimmed/{id.sample_name}.{ext}"], 
+                id=df[['sample_name']].itertuples(), ext = config['extension']
             )
         )
 
