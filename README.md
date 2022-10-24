@@ -86,8 +86,9 @@
     - 기존에 있는 툴 외의 툴 사용시 https://github.com/bmi-rna-pipeline/snakemake-wrappers 에서 wrapper를 사용/수정/제작해서 rule을 만들 수 있다.
 
 #### Snakemake 실행
-- conda environment를 activate한다.
+- conda environment를 activate한다. Conda environment는 업데이트 될 수 있기 때문에 확인해준다: https://anaconda.org/snuhbmibi/bmipreproc
     ```bash
+    mamba env create snuhbmibi/bmipreproc
     conda activate bmipreproc
     ```
  
