@@ -11,7 +11,13 @@
         docker pull snuhbmi/preproc
         docker run -it --memory="512G" --cpus=128 --name [본인이름_컨테이너명] snuhbmi/preproc
         ```
-    
+    - conda environment를 activate한다. Conda environment는 업데이트 될 수 있기 때문에 확인해준다: https://anaconda.org/snuhbmibi/bmipreproc
+        ```bash
+        # when creating new environment
+        mamba env create snuhbmibi/bmipreproc
+        # activate environment
+        conda activate bmipreproc
+        ```
 2. Snakemake directory preparation
     - Working directory로 사용할 폴더에 cd를 한 후, data와 genome 파일을 만들어준다.
         ```bash
@@ -86,11 +92,6 @@
     - 기존에 있는 툴 외의 툴 사용시 https://github.com/bmi-rna-pipeline/snakemake-wrappers 에서 wrapper를 사용/수정/제작해서 rule을 만들 수 있다.
 
 #### Snakemake 실행
-- conda environment를 activate한다. Conda environment는 업데이트 될 수 있기 때문에 확인해준다: https://anaconda.org/snuhbmibi/bmipreproc
-    ```bash
-    mamba env create snuhbmibi/bmipreproc
-    conda activate bmipreproc
-    ```
  
  - Working directory에 cd가 되어있는 것을 확인 후 진행한다.
  - Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
