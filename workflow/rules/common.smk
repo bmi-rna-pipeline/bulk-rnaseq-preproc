@@ -61,8 +61,8 @@ def all_input(wildcards):
     if config['qc']['fastqc']:
         wanted_input.extend(
             expand(
-                ["fastqc/{id.sample_name}_{id.reads}_fastqc.html",
-                "fastqc/{id.sample_name}_{id.reads}_fastqc.zip"], 
+                ["qc/{id.sample_name}_{id.reads}_fastqc.html",
+                "qc/{id.sample_name}_{id.reads}_fastqc.zip"], 
                 id=df[['sample_name', 'reads']].itertuples()
             )
         )

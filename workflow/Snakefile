@@ -17,10 +17,6 @@ if config['align']['star']:
     include: "rules/star.smk"
     include: "rules/sam.smk"
 
-if config['quant']['rsem']:
-    include: "rules/rsemindex.smk"
-    include: "rules/rsem.smk"
-
 if config['trim']['trimmomatic'] and config['ends'] == 'PE':
     include: "rules/trimPE.smk"
 elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
@@ -30,6 +26,12 @@ if config['trim']['trimgalore'] and config['ends'] == 'PE':
     include: "rules/galorePE.smk"
 elif config['trim']['trimgalore'] and config['ends'] == 'SE':
     include: "rules/galoreSE.smk"
+
+if config['quant']['rsem']:
+    include: "rules/rsemindex.smk"
+    include: "rules/rsem.smk"
+elif config['quant']['htseq']:
+    include: "rules/htseq.smk"
 
 rule all:
     input:

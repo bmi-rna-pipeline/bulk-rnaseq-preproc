@@ -1,13 +1,8 @@
-if config['ends'] == 'PE':
-    bamfile = "aligned/pe/{sample}.Aligned.toTranscriptome.sorted.bam"
-elif config['ends'] == 'SE':
-    bamfile = "aligned/se/{sample}.Aligned.toTranscriptome.sorted.bam"
-
 rule htseq_count:
     input:
         # input.bam or input.sam must be specified
         # an aligned to transcriptome BAM
-        bam=bamfile,
+        bam="aligned/{sample}.Aligned.toTranscriptome.sorted.bam",
         gtf = expand("genome/{name}.gtf", name = NAME),
     output:
         # Supported formats: tsv, csv, mtx, h5ad, loom

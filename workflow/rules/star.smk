@@ -11,7 +11,7 @@ rule star_pe_multi:
         trn="aligned/pe/{sample}.Aligned.toTranscriptome.out.bam",
         log="aligned/pe/{sample}.Log.out",
         sj="aligned/pe/{sample}.SJ.out.tab",
-        log_final="star/pe/{sample}/Log.final.out",
+        log_final="aligned/pe/{sample}/Log.final.out",
     message:
         shell('''
             echo STAR version:
