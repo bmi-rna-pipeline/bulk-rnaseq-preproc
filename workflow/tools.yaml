@@ -5,10 +5,12 @@ qc:
   fastqc: True
 
 trim:
-  trimmomatic: True
+  trimmomatic: False
+  trimgalore: True
 
 align:
   star: True
 
 quant:
-  rsem: True
+  rsem: False
+  htseq: True
