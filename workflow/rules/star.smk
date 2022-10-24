@@ -7,10 +7,10 @@ rule star_pe_multi:
         idx="genome/starindex/",
     output:
         # see STAR manual for additional output files
-        aln="star/pe/{sample}.Aligned.sortedByCoord.out.bam",
-        trn="star/pe/{sample}.Aligned.toTranscriptome.out.bam",
-        log="star/pe/{sample}.Log.out",
-        sj="star/pe/{sample}.SJ.out.tab",
+        aln="aligned/pe/{sample}.Aligned.sortedByCoord.out.bam",
+        trn="aligned/pe/{sample}.Aligned.toTranscriptome.out.bam",
+        log="aligned/pe/{sample}.Log.out",
+        sj="aligned/pe/{sample}.SJ.out.tab",
         log_final="star/pe/{sample}/Log.final.out",
     message:
         shell('''
@@ -18,7 +18,7 @@ rule star_pe_multi:
             STAR --version
             ''')
     log:
-        "star/pe/logs/{sample}.log",
+        "aligned/pe/logs/{sample}_star.log",
     params:
         # optional parameters
         extra="--outSAMtype BAM SortedByCoordinate",
@@ -35,17 +35,17 @@ rule star_se:
         idx="genome/starindex",
     output:
         # see STAR manual for additional output files
-        aln="star/se/{sample}.Aligned.sortedByCoord.out.bam",
-        trn="star/se/{sample}.Aligned.toTranscriptome.out.bam",
-        log="star/se/{sample}/Log.out",
-        log_final="star/se/{sample}/Log.final.out",
+        aln="aligned/se/{sample}.Aligned.sortedByCoord.out.bam",
+        trn="aligned/se/{sample}.Aligned.toTranscriptome.out.bam",
+        log="aligned/se/{sample}/Log.out",
+        log_final="aligned/se/{sample}/Log.final.out",
     message:
         shell('''
             echo STAR version:
             STAR --version
             ''')
     log:
-        "star/se/logs/{sample}.log",
+        "aligned/se/logs/{sample}_star.log",
     params:
         # optional parameters
         extra="--outSAMtype BAM SortedByCoordinate",

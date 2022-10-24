@@ -108,22 +108,22 @@ def all_input(wildcards):
     if config['align']['star'] and config['ends'] == 'PE':
         wanted_input.extend(
             expand(
-                ["star/pe/{id.sample_name}.Aligned.sortedByCoord.out.bam",
-                "star/pe/{id.sample_name}.Aligned.toTranscriptome.out.bam",
-                "star/pe/{id.sample_name}.Log.out",
-                "star/pe/{id.sample_name}.SJ.out.tab",
-                "star/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                ["aligned/pe/{id.sample_name}.Aligned.sortedByCoord.out.bam",
+                "aligned/pe/{id.sample_name}.Aligned.toTranscriptome.out.bam",
+                "aligned/pe/{id.sample_name}.Log.out",
+                "aligned/pe/{id.sample_name}.SJ.out.tab",
+                "aligned/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
                 id=df[['sample_name']].itertuples()
             )
         )
     elif config['align']['star'] and config['ends'] == 'SE':
         wanted_input.extend(
             expand(
-                ["star/se/{id.sample_name}.Aligned.sortedByCoord.out.bam",
-                "star/se/{id.sample_name}.Aligned.toTranscriptome.out.bam",
-                "star/se/{id.sample_name}.Log.out",
-                "star/se/{id.sample_name}.SJ.out.tab",
-                "star/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                ["aligned/se/{id.sample_name}.Aligned.sortedByCoord.out.bam",
+                "aligned/se/{id.sample_name}.Aligned.toTranscriptome.out.bam",
+                "aligned/se/{id.sample_name}.Log.out",
+                "aligned/se/{id.sample_name}.SJ.out.tab",
+                "aligned/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
                 id=df[['sample_name']].itertuples()
             )
         )
@@ -132,10 +132,18 @@ def all_input(wildcards):
         wanted_input.extend(
             expand(
                 ["genome/rsemindex/{a.name}.seq",
-                "rsem/{id.sample_name}.genes.results",
-                "rsem/{id.sample_name}.isoforms.results"],
+                "quant/{id.sample_name}.genes.results",
+                "quant/{id.sample_name}.isoforms.results"],
                 a=gdf[['name']].itertuples(), id=df[['sample_name']].itertuples()
             )
         )
+
+    if config['quant']['htseq']:
+            wanted_input.extend(
+                expand(
+                    ["quant/{id.sample_name}_count.tsv"],
+                    id=df[['sample_name']].itertuples()
+                )
+            )
 
     return wanted_input

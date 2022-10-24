@@ -13,7 +13,7 @@ rule trimpe:
         trimmomatic -version
         ''')
     log:
-        "trimmed/log/{sample}.{ext}.log"
+        "trimmed/logs/{sample}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
         trimmer=["TRAILING:3"],

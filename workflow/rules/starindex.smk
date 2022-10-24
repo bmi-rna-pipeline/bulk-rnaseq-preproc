@@ -13,6 +13,6 @@ rule star_index:
     params:
         extra="",
     log:
-        "genome/starindex/star_index.log",
+        "genome/starindex/logs/star_index.log",
     wrapper:
         "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/star/index"
