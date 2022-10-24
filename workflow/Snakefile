@@ -26,6 +26,11 @@ if config['trim']['trimmomatic'] and config['ends'] == 'PE':
 elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
     include: "rules/trimSE.smk"
 
+if config['trim']['trimgalore'] and config['ends'] == 'PE':
+    include: "rules/galorePE.smk"
+elif config['trim']['trimgalore'] and config['ends'] == 'SE':
+    include: "rules/galoreSE.smk"
+
 rule all:
     input:
         all_input,

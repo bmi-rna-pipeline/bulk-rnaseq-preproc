@@ -2,9 +2,9 @@ rule star_pe_multi:
     input:
         # use a list for multiple fastq files for one sample
         # usually technical replicates across lanes/flowcells
-        fq1=["trimmed/{sample}_1.fastq", "trimmed/{sample}_2.fastq"],
+        fq1=get_trimmed,
         # path to STAR reference genome index
-        idx="genome/starindex",
+        idx="genome/starindex/",
     output:
         # see STAR manual for additional output files
         aln="star/pe/{sample}.Aligned.sortedByCoord.out.bam",

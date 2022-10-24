@@ -20,4 +20,3 @@ ends: PE
 # path or URL to sample sheet (CSV format, columns: sample, condition, ...)
 samples: config/samples.csv
 genome: config/genome.csv
-extension: fastq

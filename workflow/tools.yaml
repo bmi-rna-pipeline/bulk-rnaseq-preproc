@@ -12,4 +12,3 @@ align:
 
 quant:
   rsem: True
-  htseq: False

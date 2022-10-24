@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 df = pd.read_csv(config['samples'], dtype='str').set_index(
-    ["sample_name", "reads", "fq"], drop=False)
+    ["sample_name", "reads", "fq", "ext"], drop=False)
 
 gdf = pd.read_csv(config['genome'], dtype='str').set_index(
     ["name", "fa", "annot"], drop=False)
@@ -11,10 +11,11 @@ gdf = pd.read_csv(config['genome'], dtype='str').set_index(
 SAMPLES = df.sample_name
 READS = df.reads
 FULL = df.fq
-EXT = config['extension']
+EXT = df.ext
 FASTA = gdf.fa
 GTF = gdf.annot
 NAME = gdf.name
+EXTOP = ['fastq.gz', 'fq.gz', 'fastq', 'fq']
 
 wildcard_constraints:
     sample = "|".join(df.sample_name),
@@ -22,6 +23,7 @@ wildcard_constraints:
     full = "|".join(df.fq),
     fasta = "|".join(gdf.fa),
     ann = "|".join(gdf.annot),
+    ext = "|".join(df.ext),
 
 def is_single_end(sample, read):
     """Determine whether single-end."""
@@ -36,6 +38,15 @@ def get_fastqs(wildcards):
         for i in range(0, len(df)):
             u = df.loc[(wildcards.sample, wildcards.read), ["full"]].dropna()
             return [f"{u.fq[i]}", f"{u.fq[i + 1]}"]
+
+def get_trimmed(wildcards):
+    """Get raw FASTQ files from unit sheet."""
+    if config['ends'] == 'SE':
+        return [f'trimmed/{df.loc[(wildcards.sample), "fq"]}']
+    else:
+        for i in range(0, len(df)):
+            u = df.loc[(wildcards.sample), ["fq"]].dropna()
+            return [f"trimmed/{u.fq[i]}", f"trimmed/{u.fq[i + 1]}"]
 
 def all_input(wildcards):
     """
@@ -59,16 +70,33 @@ def all_input(wildcards):
     if config['trim']['trimmomatic'] and config['ends'] == 'PE':
         wanted_input.extend(
             expand(
-                ["trimmed/{id.sample_name}_{id.reads}.{ext}",
-                "trimmed/{id.sample_name}_{id.reads}.se.{ext}"], 
-                id=df[['sample_name', 'reads']].itertuples(), ext = config['extension']
+                ["trimmed/{id.sample_name}_{id.reads}.{id.ext}",
+                "trimmed/{id.sample_name}_{id.reads}.se.{id.ext}"], 
+                id=df[['sample_name', 'reads', 'ext']].itertuples()
             )
         )
     elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
         wanted_input.extend(
             expand(
-                ["trimmed/{id.sample_name}.{ext}"], 
-                id=df[['sample_name']].itertuples(), ext = config['extension']
+                ["trimmed/{id.sample_name}.{id.ext}"], 
+                id=df[['sample_name', 'ext']].itertuples()
+            )
+        )
+
+    if config['trim']['trimgalore'] and config['ends'] == 'PE':
+        wanted_input.extend(
+            expand(
+                ["trimmed/{id.sample_name}_{id.reads}.{id.ext}",
+                "trimmed/{id.sample_name}_{id.reads}.{id.ext}.report.txt"], 
+                id=df[['sample_name', 'reads', 'ext']].itertuples()
+            )
+        )
+    elif config['trim']['trimgalore'] and config['ends'] == 'SE':
+        wanted_input.extend(
+            expand(
+                ["trimmed/{id.sample_name}.{id.ext}",
+                "trimmed/{id.sample_name}.{id.ext}.report.txt"], 
+                id=df[['sample_name', 'ext']].itertuples()
             )
         )
 

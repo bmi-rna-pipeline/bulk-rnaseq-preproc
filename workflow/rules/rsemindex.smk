@@ -4,7 +4,6 @@ else:
     fafile = "genome/{name}.fa"
 
 rule prepare_reference:
-    # priority: config['index']['priority']
     input:
         # reference FASTA with either the entire genome or transcript sequences
         reference_genome=fafile,

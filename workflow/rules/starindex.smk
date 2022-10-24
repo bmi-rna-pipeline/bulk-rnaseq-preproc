@@ -1,10 +1,14 @@
+if gdf.fa[0].endswith('fasta'):
+    fafile = expand("genome/{name}.fasta", name = NAME)
+else:
+    fafile = expand("genome/{name}.fa", name = NAME)
+
 rule star_index:
-    priority: config['index']['priority']
     input:
-        fasta=expand("{fa}", fa = FASTA),
-        gtf=expand("{name}.gtf", name = NAME)
+        fasta=fafile,
+        gtf=expand("genome/{name}.gtf", name = NAME)
     output:
-        directory("genome/starindex/"),
+        directory("genome/starindex"),
     threads: config['threads']
     params:
         extra="",

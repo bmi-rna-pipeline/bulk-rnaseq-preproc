@@ -355,3 +355,4 @@ MigrationBackup/
 
 # old files
 old/workflow/
+scripts/.svn/
