@@ -3,17 +3,17 @@ rule trimpe:
         r1 = "data/{sample}_1.{ext}",
         r2 = "data/{sample}_2.{ext}"
     output:
-        r1 = "trimmed/{sample}_1.{ext}",
-        r2 = "trimmed/{sample}_2.{ext}",
-        r1_unpaired = "trimmed/{sample}_1.se.{ext}",
-        r2_unpaired = "trimmed/{sample}_2.se.{ext}"
+        r1 = "trimmed/{trtool}/{sample}_1.{ext}",
+        r2 = "trimmed/{trtool}/{sample}_2.{ext}",
+        r1_unpaired = "trimmed/{trtool}/{sample}_1.se.{ext}",
+        r2_unpaired = "trimmed/{trtool}/{sample}_2.se.{ext}"
     message:
         shell('''
         echo Trimmomatic version:
         trimmomatic -version
         ''')
     log:
-        "trimmed/logs/{sample}.{ext}.trimmomatic.log"
+        "trimmed/{trtool}/logs/{sample}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
         trimmer=["TRAILING:3"],

@@ -9,28 +9,28 @@ configfile: "workflow/tools.yaml"
 
 
 include: "rules/common.smk"
-if config['qc']['fastqc']:
+if config['qc'] == 'fastqc':
     include: "rules/fastqc.smk"
 
-if config['align']['star']:
+if config['align'] == 'star':
     include: "rules/starindex.smk"
     include: "rules/star.smk"
     include: "rules/sam.smk"
 
-if config['trim']['trimmomatic'] and config['ends'] == 'PE':
+if config['trim'] == 'trimmomatic' and config['ends'] == 'PE':
     include: "rules/trimPE.smk"
-elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
+elif config['trim'] == 'trimmomatic' and config['ends'] == 'SE':
     include: "rules/trimSE.smk"
 
-if config['trim']['trimgalore'] and config['ends'] == 'PE':
+if config['trim'] == 'trimgalore' and config['ends'] == 'PE':
     include: "rules/galorePE.smk"
-elif config['trim']['trimgalore'] and config['ends'] == 'SE':
+elif config['trim'] == 'trimgalore' and config['ends'] == 'SE':
     include: "rules/galoreSE.smk"
 
-if config['quant']['rsem']:
+if config['quant'] == 'rsem':
     include: "rules/rsemindex.smk"
     include: "rules/rsem.smk"
-elif config['quant']['htseq']:
+elif config['quant'] == 'htseq':
     include: "rules/htseq.smk"
 
 rule all:

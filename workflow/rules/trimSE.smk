@@ -2,14 +2,14 @@ rule trimse:
     input:
         "data/{sample}.{ext}"
     output:
-        "trimmed/{sample}.{ext}",
+        "trimmed/{trtool}/{sample}.{ext}",
     message:
         shell('''
         echo Trimmomatic version:
         trimmomatic -version
         ''')
     log:
-        "trimmed/logs/{sample}.{ext}.trimmomatic.log"
+        "trimmed/{trtool}/logs/{sample}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
         trimmer=["TRAILING:3"],

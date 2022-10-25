@@ -1,13 +1,13 @@
 if config['ends'] == 'PE':
-    bamfile = "aligned/pe/{sample}.Aligned.toTranscriptome.out.bam"
+    bamfile = "aligned/{altool}/pe/{sample}.Aligned.toTranscriptome.out.bam"
 elif config['ends'] == 'SE':
-    bamfile = "aligned/se/{sample}.Aligned.toTranscriptome.out.bam"
+    bamfile = "aligned/{altool}/se/{sample}.Aligned.toTranscriptome.out.bam"
 
 rule samtools_sort:
     input:
         bamfile
     output:
-        "aligned/{sample}.Aligned.toTranscriptome.sorted.bam"
+        "aligned/{altool}/{sample}.Aligned.toTranscriptome.sorted.bam"
     params:
         "-m 4G"
     threads: config['threads']

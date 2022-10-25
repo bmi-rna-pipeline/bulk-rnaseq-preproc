@@ -46,7 +46,7 @@ def get_trimmed(wildcards):
     else:
         for i in range(0, len(df)):
             u = df.loc[(wildcards.sample), ["fq"]].dropna()
-            return [f"trimmed/{u.fq[i]}", f"trimmed/{u.fq[i + 1]}"]
+            return [f"trimmed/{{tool}}/{u.fq[i]}", f"trimmed/{{tool}}/{u.fq[i + 1]}"]
 
 def all_input(wildcards):
     """
@@ -58,91 +58,91 @@ def all_input(wildcards):
             [directory("./genome/")]
         )
 
-    if config['qc']['fastqc']:
+    if config['qc']=='fastqc':
         wanted_input.extend(
             expand(
-                ["qc/{id.sample_name}_{id.reads}_fastqc.html",
-                "qc/{id.sample_name}_{id.reads}_fastqc.zip"], 
-                id=df[['sample_name', 'reads']].itertuples()
+                ["qc/{tool}/{id.sample_name}_{id.reads}_fastqc.html",
+                "qc/{tool}/{id.sample_name}_{id.reads}_fastqc.zip"], 
+                id=df[['sample_name', 'reads']].itertuples(), tool= config['qc']
             )
         )
 
-    if config['trim']['trimmomatic'] and config['ends'] == 'PE':
+    if config['trim']=='trimmomatic' and config['ends'] == 'PE':
         wanted_input.extend(
             expand(
-                ["trimmed/{id.sample_name}_{id.reads}.{id.ext}",
-                "trimmed/{id.sample_name}_{id.reads}.se.{id.ext}"], 
-                id=df[['sample_name', 'reads', 'ext']].itertuples()
+                ["trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}",
+                "trimmed/{tool}/{id.sample_name}_{id.reads}.se.{id.ext}"], 
+                id=df[['sample_name', 'reads', 'ext']].itertuples(), tool= config['trim']
             )
         )
-    elif config['trim']['trimmomatic'] and config['ends'] == 'SE':
+    elif config['trim']=='trimmomatic' and config['ends'] == 'SE':
         wanted_input.extend(
             expand(
-                ["trimmed/{id.sample_name}.{id.ext}"], 
-                id=df[['sample_name', 'ext']].itertuples()
-            )
-        )
-
-    if config['trim']['trimgalore'] and config['ends'] == 'PE':
-        wanted_input.extend(
-            expand(
-                ["trimmed/{id.sample_name}_{id.reads}.{id.ext}",
-                "trimmed/{id.sample_name}_{id.reads}.{id.ext}.report.txt"], 
-                id=df[['sample_name', 'reads', 'ext']].itertuples()
-            )
-        )
-    elif config['trim']['trimgalore'] and config['ends'] == 'SE':
-        wanted_input.extend(
-            expand(
-                ["trimmed/{id.sample_name}.{id.ext}",
-                "trimmed/{id.sample_name}.{id.ext}.report.txt"], 
-                id=df[['sample_name', 'ext']].itertuples()
+                ["trimmed/{tool}/{id.sample_name}.{id.ext}"], 
+                id=df[['sample_name', 'ext']].itertuples(), tool= config['trim']
             )
         )
 
-    if config['align']['star']:
+    if config['trim']=='trimgalore' and config['ends'] == 'PE':
+        wanted_input.extend(
+            expand(
+                ["trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}",
+                "trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}.report.txt"], 
+                id=df[['sample_name', 'reads', 'ext']].itertuples(), tool= config['trim']
+            )
+        )
+    elif config['trim']=='trimgalore' and config['ends'] == 'SE':
+        wanted_input.extend(
+            expand(
+                ["trimmed/{tool}/{id.sample_name}.{id.ext}",
+                "trimmed/{tool}/{id.sample_name}.{id.ext}.report.txt"], 
+                id=df[['sample_name', 'ext']].itertuples(), tool= config['trim']
+            )
+        )
+
+    if config['align']=='star':
         wanted_input.extend(
             [directory("genome/starindex/")]
         )
     
-    if config['align']['star'] and config['ends'] == 'PE':
+    if config['align']=='star' and config['ends'] == 'PE':
         wanted_input.extend(
             expand(
-                ["aligned/pe/{id.sample_name}.Aligned.sortedByCoord.out.bam",
-                "aligned/pe/{id.sample_name}.Aligned.toTranscriptome.out.bam",
-                "aligned/pe/{id.sample_name}.Log.out",
-                "aligned/pe/{id.sample_name}.SJ.out.tab",
-                "aligned/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
-                id=df[['sample_name']].itertuples()
+                ["aligned/{tool}/pe/{id.sample_name}.Aligned.sortedByCoord.out.bam",
+                "aligned/{tool}/pe/{id.sample_name}.Aligned.toTranscriptome.out.bam",
+                "aligned/{tool}/pe/{id.sample_name}.Log.out",
+                "aligned/{tool}/pe/{id.sample_name}.SJ.out.tab",
+                "aligned/{tool}/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                id=df[['sample_name']].itertuples(), tool= config['align']
             )
         )
-    elif config['align']['star'] and config['ends'] == 'SE':
+    elif config['align']=='star' and config['ends'] == 'SE':
         wanted_input.extend(
             expand(
-                ["aligned/se/{id.sample_name}.Aligned.sortedByCoord.out.bam",
-                "aligned/se/{id.sample_name}.Aligned.toTranscriptome.out.bam",
-                "aligned/se/{id.sample_name}.Log.out",
-                "aligned/se/{id.sample_name}.SJ.out.tab",
-                "aligned/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
-                id=df[['sample_name']].itertuples()
+                ["aligned/{tool}/se/{id.sample_name}.Aligned.sortedByCoord.out.bam",
+                "aligned/{tool}/se/{id.sample_name}.Aligned.toTranscriptome.out.bam",
+                "aligned/{tool}/se/{id.sample_name}.Log.out",
+                "aligned/{tool}/se/{id.sample_name}.SJ.out.tab",
+                "aligned/{tool}/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                id=df[['sample_name']].itertuples(), tool= config['align']
             )
         )
 
-    if config['quant']['rsem']:
+    if config['quant']=='rsem':
         wanted_input.extend(
             expand(
                 ["genome/rsemindex/{a.name}.seq",
-                "quant/{id.sample_name}.genes.results",
-                "quant/{id.sample_name}.isoforms.results"],
-                a=gdf[['name']].itertuples(), id=df[['sample_name']].itertuples()
+                "quant/{tool}/{id.sample_name}.genes.results",
+                "quant/{tool}/{id.sample_name}.isoforms.results"],
+                a=gdf[['name']].itertuples(), id=df[['sample_name']].itertuples(), tool=config['quant']
             )
         )
 
-    if config['quant']['htseq']:
+    if config['quant']=='htseq':
             wanted_input.extend(
                 expand(
-                    ["quant/{id.sample_name}_count.tsv"],
-                    id=df[['sample_name']].itertuples()
+                    ["quant/{tool}/{id.sample_name}_count.tsv"],
+                    id=df[['sample_name']].itertuples(), tool= config['quant']
                 )
             )
 
