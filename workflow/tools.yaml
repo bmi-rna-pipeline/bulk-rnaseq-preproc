@@ -1,16 +1,14 @@
 # tools
 index:
 
-qc:
-  fastqc: True
+# raw qc tool <fastqc>
+qc: fastqc
 
-trim:
-  trimmomatic: False
-  trimgalore: True
+# trim tool <trimmomatic/trimgalore>
+trim: trimmomatic
 
-align:
-  star: True
+# alignment tool <star>
+align: star
 
-quant:
-  rsem: False
-  htseq: True
+# quantification tool <rsem/htseq>
+quant: rsem

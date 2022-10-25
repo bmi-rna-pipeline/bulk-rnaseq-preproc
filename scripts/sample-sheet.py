@@ -29,13 +29,18 @@ fq = [os.path.splitext(fqfiles[i])[0].split('.') for i in range(0, len(fqfiles))
 full = [f"{sampleread[i]}.{extension[i]}" for i in range(0, len(fqfiles))]
 
 reads = []
+sampleID = []
 for i in range(0, len(fqfiles)):
     if fqfiles[i].split('.f')[0].endswith('_2'):
       reads.append('2')
-    else:
+      sampleID.append((sampleread[i]).split('_2')[0])
+    elif fqfiles[i].split('.f')[0].endswith('_1'):
       reads.append('1')
+      sampleID.append((sampleread[i]).split('_1')[0])
+    else:
+      reads.append('se')
+      sampleID.append(sampleread[i])
 
-sampleID = [(sampleread[i]).split('_')[0] for i in range(0, len(fqfiles))]
 
 sampledf = pd.DataFrame({"sample_name":[], "fq":[], "full":[], "reads":[], "ext": []})
 

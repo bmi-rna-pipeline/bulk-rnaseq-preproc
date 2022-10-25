@@ -1,15 +1,15 @@
 rule trimse:
     input:
-        "data/{sample}.{ext}"
+        get_fastqs,
     output:
-        "trimmed/{sample}.{ext}",
+        "trimmed/{trtool}/{sample}.{ext}",
     message:
         shell('''
         echo Trimmomatic version:
         trimmomatic -version
         ''')
     log:
-        "trimmed/logs/{sample}.{ext}.trimmomatic.log"
+        "trimmed/{trtool}/logs/{sample}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
         trimmer=["TRAILING:3"],
@@ -19,3 +19,13 @@ rule trimse:
     threads: config['threads']
     wrapper:
         "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/trimmomatic/se"
+
+rule trim_rename:
+    input:
+        "trimmed/{trtool}/{sample}trimmed.fq.gz",
+    output:
+        "trimmed/{trtool}/{sample}.{ext}",
+    shell:
+        '''
+        mv {input} {output}
+        '''
