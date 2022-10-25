@@ -11,4 +11,4 @@ trim: trimmomatic
 align: star
 
 # quantification tool <rsem/htseq>
-quant: rsem
+quant: htseq
