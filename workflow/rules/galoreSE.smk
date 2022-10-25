@@ -20,3 +20,4 @@ rule trim_rename:
         '''
         mv {input} {output}
         '''
+        
