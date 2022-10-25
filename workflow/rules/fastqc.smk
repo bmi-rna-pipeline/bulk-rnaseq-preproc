@@ -8,8 +8,8 @@ rule fastqc:
     input:
         get_fastqs,    
     output:
-        html = "qc/{qctool}/{sample}_{read}_fastqc.html",
-        zip = "qc/{qctool}/{sample}_{read}_fastqc.zip"
+        html
+        zip
     message:
         shell('''
         echo fastqc version:
