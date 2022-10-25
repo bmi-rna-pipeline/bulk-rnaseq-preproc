@@ -16,4 +16,4 @@ rule gff:
     run:
         if filename.endswith('gff3') or filename.endswith('gff'):
             shell("gffread {input.og} -T -o {params.gtfname}")
-        shell("python ./scripts/ref.py")
+        shell("python ./scripts/ref.py") 
