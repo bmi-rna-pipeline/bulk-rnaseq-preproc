@@ -37,7 +37,7 @@ for i in range(0, len(fqfiles)):
 
 sampleID = [(sampleread[i]).split('_')[0] for i in range(0, len(fqfiles))]
 
-sampledf = pd.DataFrame({"sample_name":[], "fq":[], "reads":[], "ext": []})
+sampledf = pd.DataFrame({"sample_name":[], "fq":[], "full":[], "reads":[], "ext": []})
 
 sampledf["sample_name"] = sampleID
 sampledf["fq"] = full
