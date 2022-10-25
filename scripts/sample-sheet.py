@@ -9,38 +9,39 @@ DATAPATH = os.getcwd()
 filecnt = len([fn for fn in os.listdir("./data/")])
 filenames = [str([fn for fn in os.listdir("./data/")][i] for i in range(0, filecnt))]
 
-fqpath = [f"{DATAPATH}/data/" + str([fn for fn in os.listdir("./data/")][i]) for i in range(0, filecnt)]
-
-sampleread = [os.path.splitext(os.path.basename(fqpath[i]))[0].split('.')[0] for i in range(0, len(fqpath))] 
-zip = [os.path.splitext(os.path.basename(fqpath[i]))[1].split('.')[1] for i in range(0, len(fqpath))]
-
-fq = [os.path.splitext(fqpath[i])[0].split('.') for i in range(0, len(fqpath))]
-zip = [os.path.splitext(fqpath[i])[-1] for i in range(0, len(fqpath))]
-
+list = ['./data/*.fastq.gz', './data/*.fq.gz', './data/*.fastq', './data/*.fq']
 ext = ['fastq.gz', 'fq.gz', 'fastq', 'fq']
-extension = []
 
-for i in range(0, filecnt):
-  for n in range(0, 4):
-    if fqpath[i].endswith(ext[n]):
+extension = []
+fqfiles = []
+for f in list:
+  fqfiles.extend(glob.glob(f))
+
+for fq in fqfiles:
+  for n in range(0, 3):
+    if fq.endswith(ext[n]):
       extension.append(ext[n])
 
-full = [f"{sampleread[i]}.{extension[i]}" for i in range(0, len(fqpath))]
+sampleread = [os.path.splitext(os.path.basename(fqfiles[i]))[0].split('.')[0] for i in range(0, len(fqfiles))] 
+
+fq = [os.path.splitext(fqfiles[i])[0].split('.') for i in range(0, len(fqfiles))]
+
+full = [f"{sampleread[i]}.{extension[i]}" for i in range(0, len(fqfiles))]
 
 reads = []
-for i in range(0, len(fqpath)):
-    if fqpath[i].split('.f')[0].endswith('_2'):
+for i in range(0, len(fqfiles)):
+    if fqfiles[i].split('.f')[0].endswith('_2'):
       reads.append('2')
     else:
       reads.append('1')
 
-sampleID = ['_'.join((sampleread[i].split('_'))[:-1]) for i in range(0, filecnt)]
+sampleID = [(sampleread[i]).split('_')[0] for i in range(0, len(fqfiles))]
 
 sampledf = pd.DataFrame({"sample_name":[], "fq":[], "reads":[], "ext": []})
 
 sampledf["sample_name"] = sampleID
 sampledf["fq"] = full
-sampledf["full"] = fqpath
+sampledf["full"] = fqfiles
 sampledf["reads"] = reads
 sampledf["ext"] = extension
 
