@@ -1,6 +1,6 @@
 rule fastqc:
     input:
-        get_fastqs
+        get_fastqs,
     output:
         html = "qc/{qctool}/{sample}_{read}_fastqc.html",
         zip = "qc/{qctool}/{sample}_{read}_fastqc.zip"

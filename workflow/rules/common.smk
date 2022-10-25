@@ -32,21 +32,21 @@ def is_single_end(sample, read):
 
 def get_fastqs(wildcards):
     """Get raw FASTQ files from unit sheet."""
-    if is_single_end(wildcards.sample, wildcards.read) is not None:
-        return df.loc[(wildcards.sample, wildcards.read), "full"]
+    if config['ends'] == 'SE':
+        return [f'data/{df.loc[(wildcards.sample), "fq"]}']
     else:
         for i in range(0, len(df)):
-            u = df.loc[(wildcards.sample, wildcards.read), ["full"]].dropna()
-            return [f"{u.fq[i]}", f"{u.fq[i + 1]}"]
+            u = df.loc[(wildcards.sample), ["fq"]].dropna()
+            return [f'data/{u.fq[i]}', f'data/{u.fq[i + 1]}']
 
 def get_trimmed(wildcards):
     """Get raw FASTQ files from unit sheet."""
     if config['ends'] == 'SE':
-        return [f'trimmed/{df.loc[(wildcards.sample), "fq"]}']
+        return [f'trimmed/{config["trim"]}/{df.loc[(wildcards.sample), "fq"]}']
     else:
         for i in range(0, len(df)):
             u = df.loc[(wildcards.sample), ["fq"]].dropna()
-            return [f"trimmed/{{tool}}/{u.fq[i]}", f"trimmed/{{tool}}/{u.fq[i + 1]}"]
+            return [f'trimmed/{config["trim"]}/{u.fq[i]}', f'trimmed/{config["trim"]}/{u.fq[i + 1]}']
 
 def all_input(wildcards):
     """
