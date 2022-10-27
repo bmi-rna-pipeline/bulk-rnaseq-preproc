@@ -21,7 +21,7 @@ rule star_pe_multi:
         "aligned/{altool}/pe/logs/{sample}_star.log",
     params:
         # optional parameters
-        extra="--outSAMtype BAM SortedByCoordinate",
+        extra=config["starparams"],
         quant="--quantMode TranscriptomeSAM",
     threads: config['threads']
     wrapper:
