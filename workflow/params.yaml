@@ -1,0 +1,3 @@
+# Parameters for tools
+
+starparams: "--outSAMtype BAM SortedByCoordinate"
