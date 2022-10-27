@@ -1,5 +1,10 @@
 # Parameters for tools
 
-trimparams: "TRAILING:3"
+# trimmomatic parameters
+trim:
+  adapter: "TRAILING:3"
+  params: ""
+  compression: "-9"
 
+# star parameters
 starparams: "--outSAMtype BAM SortedByCoordinate"
