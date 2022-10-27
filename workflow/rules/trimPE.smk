@@ -7,11 +7,6 @@ rule trimpe:
         r2 = "trimmed/{trtool}/{sample}_2.{ext}",
         r1_unpaired = "trimmed/{trtool}/{sample}_1.se.{ext}",
         r2_unpaired = "trimmed/{trtool}/{sample}_2.se.{ext}"
-    message:
-        shell('''
-        echo Trimmomatic version:
-        trimmomatic -version
-        ''')
     log:
         "trimmed/{trtool}/logs/{sample}.{ext}.trimmomatic.log"
     params:
@@ -19,7 +14,7 @@ rule trimpe:
         trimmer=[config['trim']['adapter']],
         # optional parameters
         extra=config['trim']['params'],
-        compression_level="-9"
+        compression_level=config['trim']['compression']
     threads: config['threads']
     wrapper:
         "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/trimmomatic/pe"
