@@ -16,9 +16,9 @@ rule trimpe:
         "trimmed/{trtool}/logs/{sample}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
-        trimmer=["TRAILING:3"],
+        trimmer=[config['trim']['adapter']],
         # optional parameters
-        extra="",
+        extra=config['trim']['params'],
         compression_level="-9"
     threads: config['threads']
     wrapper:
