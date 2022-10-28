@@ -3,8 +3,10 @@
 # trimmomatic parameters
 trimmomatic:
   adapter: "TRAILING:3"
-  params: ""
+  extra: ""
   compression: "-9"
 
 # star parameters
-starparams: "--outSAMtype BAM SortedByCoordinate --outSAMheaderCommentFile commentsENCODElong.txt --outSAMheaderHD @HD VN:1.4 SO:coordinate"
+starparams: 
+  extra: "--outSAMtype BAM SortedByCoordinate --outSAMheaderCommentFile commentsENCODElong.txt --outSAMheaderHD @HD VN:1.4 SO:coordinate"
+  quant: "--quantMode TranscriptomeSAM"
