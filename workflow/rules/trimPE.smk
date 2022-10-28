@@ -13,7 +13,7 @@ rule trimpe:
         # list of trimmers (see manual)
         trimmer=[config['trimmomatic']['adapter']],
         # optional parameters
-        extra=config['trimmomatic']['params'],
+        extra=config['trimmomatic']['extra'],
         compression_level=config['trimmomatic']['compression']
     threads: config['threads']
     wrapper:
