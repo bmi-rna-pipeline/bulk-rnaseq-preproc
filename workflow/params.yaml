@@ -7,4 +7,4 @@ trimmomatic:
   compression: "-9"
 
 # star parameters
-starparams: "--outSAMtype BAM SortedByCoordinate"
+starparams: "--outSAMtype BAM SortedByCoordinate --outSAMheaderCommentFile commentsENCODElong.txt --outSAMheaderHD @HD VN:1.4 SO:coordinate"
