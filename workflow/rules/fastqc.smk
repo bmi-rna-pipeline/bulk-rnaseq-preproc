@@ -17,7 +17,7 @@ rule fastqc:
         fastqc --version
         ''')
     log:
-        "qc/{qctool}/logs/{sample}.fastqc.log"
+        expand("qc/{{qctool}}/logs/{{sample}}_{read}.fastqc.log", read=["1", "2"])
     threads: config['threads']
     wrapper:
          "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/fastqc"
