@@ -1,6 +1,6 @@
 if config['ends'] == 'PE':
     html = expand("qc/{{qctool}}/{{sample}}_{read}_fastqc.html", read=READS)
-    zip = expand("qc/{qctool}/{{sample}}_{read}_fastqc.zip", read=READS)
+    zip = expand("qc/{{qctool}}/{{sample}}_{read}_fastqc.zip", read=READS)
 elif config['ends'] == 'SE':
     html = "qc/{qctool}/{sample}_fastqc.html"
     zip = "qc/{qctool}/{sample}_fastqc.zip"
