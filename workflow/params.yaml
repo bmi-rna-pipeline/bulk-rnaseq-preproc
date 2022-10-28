@@ -1,7 +1,7 @@
 # Parameters for tools
 
 # trimmomatic parameters
-trim:
+trimmomatic:
   adapter: "TRAILING:3"
   params: ""
   compression: "-9"
