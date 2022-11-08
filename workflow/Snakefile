@@ -6,6 +6,7 @@ min_version("6.4.1")
 
 configfile: "workflow/config.yaml"
 configfile: "workflow/tools.yaml"
+configfile: "workflow/params.yaml"
 
 
 include: "rules/common.smk"

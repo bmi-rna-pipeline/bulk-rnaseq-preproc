@@ -1,0 +1,24 @@
+# Threads to utilize
+threads: 8
+
+# 'True' if stranded, 'False' if unstranded.
+# ends 'PE' if paired end, 'SE' if single end
+stranded: True
+ends: PE
+
+# Parameters for tools
+
+# trimmomatic parameters
+trimmparams:
+  adapter: "TRAILING:3"
+  extra: ""
+  compression: "-9"
+ 
+# trim galore parameters
+galoreparams:
+  extra: ""
+
+# star parameters
+starparams: 
+  extra: "--outSAMtype BAM SortedByCoordinate --outSAMheaderCommentFile commentsENCODElong.txt --outSAMheaderHD @HD VN:1.4 SO:coordinate"
+  quant: "--quantMode TranscriptomeSAM"

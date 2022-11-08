@@ -9,14 +9,6 @@ printshellcmds: True
 rerun-incomplete: True
 restart-times: 3
 
-# Threads to utilize
-threads: 8
-
-# 'True' if stranded, 'False' if unstranded.
-# ends 'PE' if paired end, 'SE' if single end
-stranded: True
-ends: PE
-
 # path or URL to sample sheet (CSV format, columns: sample, condition, ...)
 samples: config/samples.csv
 genome: config/genome.csv
