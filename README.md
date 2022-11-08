@@ -12,13 +12,14 @@
 4. tools.yaml에 사용할 툴을 지정하고, params.yaml에서 파라미터와 threads, strandedness, PE/SE 설정을 한다.
 5. Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
 6. Snakemake를 실행한다.
-        ```bash
-        # dry run
-        snakemake -n
-        
-        # run snakemake
-        snakemake --cores 4
-        ```
+
+    ```bash
+    # dry run
+    snakemake -n
+
+    # run snakemake
+    snakemake --cores 4
+    ```
 
 #### Checklist
 1. raw 파일과 reference genome 파일이 형식에 맞는 것을 확인.
