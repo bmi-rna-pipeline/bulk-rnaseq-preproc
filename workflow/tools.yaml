@@ -1,6 +1,4 @@
-# tools
-index:
-
+# Select which tools to use
 # raw qc tool <fastqc>
 qc: fastqc
 
@@ -9,6 +7,9 @@ trim: trimmomatic
 
 # alignment tool <star>
 align: star
+
+# alignment qc
+alqc: 
 
 # quantification tool <rsem/htseq>
 quant: rsem
