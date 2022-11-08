@@ -18,7 +18,7 @@ rule calculate_expression:
         pref = lambda wildcards: expand("genome/rsemindex/{name}", name = NAME),
         paired_end=True,
         # additional optional parameters to pass to rsem, for example,
-        extra="--seed 12345 --estimate-rspd --no-bam-output",
+        extra=config['rsemparams']['extra'],
     log:
         "quant/{qtool}/logs/calculate_expression.{sample}.log",
     wrapper:
