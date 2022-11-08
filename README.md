@@ -9,6 +9,10 @@
     - data 폴더: raw 파일이 존재해야함
 2. Snakemake가 설치된 conda environment를 activate한다.
 3. github에서 snakemake관련 파일을 받는다.
+    ```bash
+    svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/workflow
+    svn checkout https://github.com/bmi-rna-pipeline/bulk-rnaseq-preproc/trunk/scripts
+    ```
 4. tools.yaml에 사용할 툴을 지정하고, params.yaml에서 파라미터와 threads, strandedness, PE/SE 설정을 한다.
 5. Snakemake 실행 전에 scripts 폴더의 파일들을 실행해준다.
 6. Snakemake를 실행한다.
