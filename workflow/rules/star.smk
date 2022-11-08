@@ -1,5 +1,5 @@
 if config['ends'] == 'SE':
-    trim1 = "trimmed/{trtool}/{{sample}}.{ext}".format(trtool=config['trim'], ext=EXT)
+    trim1 = "trimmed/{trtool}/{{sample}}_se.{ext}".format(trtool=config['trim'], ext=EXT)
     trim2 = ""
 else:
     trim1 = "trimmed/{trtool}/{{sample}}_1.{ext}".format(trtool=config['trim'], ext=EXT)
