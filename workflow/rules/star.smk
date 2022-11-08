@@ -1,9 +1,9 @@
 if config['ends'] == 'SE':
-    trim1 = expand("trimmed/{trtool}/{{sample}}.{ext}", trtool=config['trim'], ext=EXT[0])
+    trim1 = "trimmed/{trtool}/{{sample}}_se.{ext}".format(trtool=config['trim'], ext=EXT)
     trim2 = ""
 else:
-    trim1 = expand("trimmed/{trtool}/{{sample}}_1.{ext}", trtool=config['trim'], ext=EXT[0])
-    trim2 = expand("trimmed/{trtool}/{{sample}}_2.{ext}", trtool=config['trim'], ext=EXT[0])
+    trim1 = "trimmed/{trtool}/{{sample}}_1.{ext}".format(trtool=config['trim'], ext=EXT)
+    trim2 = "trimmed/{trtool}/{{sample}}_2.{ext}".format(trtool=config['trim'], ext=EXT)
 
 rule star:
     input:

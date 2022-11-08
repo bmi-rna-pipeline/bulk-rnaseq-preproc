@@ -1,6 +1,6 @@
 rule trimse:
     input:
-        get_fastqs,
+        "data/{sample}.{ext}",
     output:
         "trimmed/{trtool}/{sample}.{ext}",
     message:
@@ -19,13 +19,3 @@ rule trimse:
     threads: config['threads']
     wrapper:
         "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/trimmomatic/se"
-
-rule trim_rename:
-    input:
-        "trimmed/{trtool}/{sample}trimmed.fq.gz",
-    output:
-        "trimmed/{trtool}/{sample}.{ext}",
-    shell:
-        '''
-        mv {input} {output}
-        '''
