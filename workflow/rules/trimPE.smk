@@ -11,10 +11,10 @@ rule trimpe:
         "trimmed/{trtool}/logs/{sample}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
-        trimmer=[config['trimmomatic']['adapter']],
+        trimmer=[config['trimmparams']['adapter']],
         # optional parameters
-        extra=config['trimmomatic']['extra'],
-        compression_level=config['trimmomatic']['compression']
+        extra=config['trimmparams']['extra'],
+        compression_level=config['trimmparams']['compression']
     threads: config['threads']
     wrapper:
         "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/trimmomatic/pe"

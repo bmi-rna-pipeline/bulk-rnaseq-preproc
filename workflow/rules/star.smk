@@ -1,9 +1,9 @@
 if config['ends'] == 'SE':
-    trim1 = "trimmed/{trtool}/{{sample}}_se.{ext}".format(trtool=config['trim'], ext=EXT)
+    trim1 = "trimmed/{trtool}/{{sample}}_se.{ext}".format(trtool=config['trim'], ext=EXT[0])
     trim2 = ""
 else:
-    trim1 = "trimmed/{trtool}/{{sample}}_1.{ext}".format(trtool=config['trim'], ext=EXT)
-    trim2 = "trimmed/{trtool}/{{sample}}_2.{ext}".format(trtool=config['trim'], ext=EXT)
+    trim1 = "trimmed/{trtool}/{{sample}}_1.{ext}".format(trtool=config['trim'], ext=EXT[0])
+    trim2 = "trimmed/{trtool}/{{sample}}_2.{ext}".format(trtool=config['trim'], ext=EXT[0])
 
 rule star:
     input:
@@ -20,11 +20,6 @@ rule star:
         log="aligned/{altool}/pe/{sample}.Log.out",
         sj="aligned/{altool}/pe/{sample}.SJ.out.tab",
         log_final="aligned/{altool}/pe/{sample}/Log.final.out",
-    message:
-        shell('''
-            echo STAR version:
-            STAR --version
-            ''')
     log:
         "aligned/{altool}/pe/logs/{sample}_star.log",
     params:

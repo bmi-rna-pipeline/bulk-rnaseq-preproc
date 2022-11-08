@@ -22,3 +22,6 @@ galoreparams:
 starparams: 
   extra: "--outSAMtype BAM SortedByCoordinate --outSAMheaderCommentFile commentsENCODElong.txt --outSAMheaderHD @HD VN:1.4 SO:coordinate"
   quant: "--quantMode TranscriptomeSAM"
+
+rsemparams:
+  extra: "--seed 12345 --estimate-rspd --no-bam-output"

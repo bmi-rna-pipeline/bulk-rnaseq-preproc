@@ -1,23 +1,11 @@
-if config['ends'] == 'PE':
-    html = expand("qc/{{qctool}}/{{sample}}_{read}_fastqc.html", read=["1", "2"])
-    zip = expand("qc/{{qctool}}/{{sample}}_{read}_fastqc.zip", read=["1", "2"])
-elif config['ends'] == 'SE':
-    html = "qc/{qctool}/{sample}_fastqc.html"
-    zip = "qc/{qctool}/{sample}_fastqc.zip"
-
 rule fastqc:
     input:
-        get_fastqs,
+        expand("data/{{sample}}_{{read}}.{ext}", ext=EXT[0])
     output:
-        html = html,
-        zip = zip
-    message:
-        shell('''
-        echo fastqc version:
-        fastqc --version
-        ''')
+        html = "qc/{qctool}/{sample}_{read}_fastqc.html",
+        zip = "qc/{qctool}/{sample}_{read}_fastqc.zip"
     log:
-        expand("qc/{{qctool}}/logs/{{sample}}_{read}.fastqc.log", read=["1", "2"])
+        "qc/{qctool}/logs/{sample}_{read}.fastqc.log"
     threads: config['threads']
     wrapper:
          "https://raw.githubusercontent.com/bmi-rna-pipeline/snakemake-wrappers/master/bio/fastqc"
