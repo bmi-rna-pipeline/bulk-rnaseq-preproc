@@ -50,8 +50,6 @@
         ```
     - conda environment를 activate한다. Conda environment는 업데이트 될 수 있기 때문에 확인해준다: https://anaconda.org/snuhbmibi/bmipreproc
         ```bash
-        # when creating new environment
-        mamba env create snuhbmibi/bmipreproc
         # activate environment
         conda activate bmipreproc
         ```
