@@ -48,7 +48,7 @@
         docker pull snuhbmi/preproc
         docker run -it --memory="512G" --cpus=128 --name [본인이름_컨테이너명] snuhbmi/preproc
         ```
-    - conda environment를 activate한다. Conda environment는 업데이트 될 수 있기 때문에 확인해준다: https://anaconda.org/snuhbmibi/bmipreproc
+    - conda environment를 activate한다.
         ```bash
         # activate environment
         conda activate bmipreproc
