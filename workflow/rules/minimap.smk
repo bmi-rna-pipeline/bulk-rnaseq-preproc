@@ -5,7 +5,7 @@ rule minimap2:
     output:
         "aligned/{altool}/{sample}_aln.sorted.bam",
     log:
-        "aligned/{altool}/pe/logs/{sample}_minimap.log",
+        "aligned/{altool}/logs/{sample}_minimap.log",
     params:
         # optional parameters
         extra=config['miniparams']['extra'],
