@@ -127,6 +127,14 @@ def all_input(wildcards):
                 id=df[['sample_name']].itertuples(), tool= config['align']
             )
         )
+    elif config['align']=='minimap':
+        wanted_input.extend(
+            expand(
+                ["aligned/{tool}/{id.sample_name}_aln.sorted.bam",
+                "genome/minimapindex/{a.name}.mmi"],
+                a=gdf[['name']].itertuples(), id=df[['sample_name']].itertuples(), tool= config['align']
+            )
+        )
 
     if config['quant']=='rsem':
         wanted_input.extend(
