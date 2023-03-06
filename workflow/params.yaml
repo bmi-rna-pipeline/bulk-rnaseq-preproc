@@ -3,8 +3,10 @@ threads: 8
 
 # 'True' if stranded, 'False' if unstranded.
 # ends 'PE' if paired end, 'SE' if single end
+# 'short' if short-read 'long' if long-read
 stranded: True
-ends: PE
+ends: SE
+reads: long
 
 # Parameters for tools
 
@@ -25,3 +27,9 @@ starparams:
 
 rsemparams:
   extra: "--seed 12345 --estimate-rspd --no-bam-output"
+
+# minimap2 parameters
+miniparams:
+  extra: "-ax splice"  # optional
+  sorting: "coordinate"  # optional: Enable sorting. Possible values: 'none', 'queryname' or 'coordinate'
+  sort_extra: ""  # optional: extra arguments for samtools/picard

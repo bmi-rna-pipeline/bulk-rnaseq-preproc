@@ -4,12 +4,15 @@ qc: fastqc
 
 # trim tool <trimmomatic/trimgalore>
 trim: trimmomatic
+# trim: trimgalore
 
-# alignment tool <star>
+# alignment tool <star/minimap>
 align: star
+# align: minimap
 
 # alignment qc
-alqc: 
+# alqc: 
 
 # quantification tool <rsem/htseq>
 quant: rsem
+# quant: htseq

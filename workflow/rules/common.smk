@@ -25,28 +25,28 @@ wildcard_constraints:
     ann = "|".join(gdf.annot),
     ext = "|".join(df.ext),
 
-def is_single_end(sample, read):
-    """Determine whether single-end."""
-    fq2_not_present = df.loc[pd.isnull(df['reads'])]
-    return fq2_not_present["sample_name"]
+# def is_single_end(sample, read):
+#     """Determine whether single-end."""
+#     fq2_not_present = df.loc[pd.isnull(df['reads'])]
+#     return fq2_not_present["sample_name"]
 
-def get_fastqs(wildcards):
-    """Get raw FASTQ files from unit sheet."""
-    if config['ends'] == 'SE':
-        return [f'data/{df.loc[(wildcards.sample), "fq"]}']
-    else:
-        for i in range(0, len(df)):
-            u = df.loc[(wildcards.sample), ["fq"]].dropna()
-            return [f'data/{u.fq[i]}', f'data/{u.fq[i + 1]}']
+# def get_fastqs(wildcards):
+#     """Get raw FASTQ files from unit sheet."""
+#     if config['ends'] == 'SE':
+#         return [f'data/{df.loc[(wildcards.sample), "fq"]}']
+#     else:
+#         for i in range(0, len(df)):
+#             u = df.loc[(wildcards.sample), ["fq"]].dropna()
+#             return [f'data/{u.fq[i]}', f'data/{u.fq[i + 1]}']
 
-def get_trimmed(wildcards):
-    """Get raw FASTQ files from unit sheet."""
-    if config['ends'] == 'SE':
-        return [f'trimmed/{config["trim"]}/{df.loc[(wildcards.sample), "fq"]}']
-    else:
-        for i in range(0, len(df)):
-            u = df.loc[(wildcards.sample), ["fq"]].dropna()
-            return [f'trimmed/{config["trim"]}/{u.fq[i]}', f'trimmed/{config["trim"]}/{u.fq[i + 1]}']
+# def get_trimmed(wildcards):
+#     """Get raw FASTQ files from unit sheet."""
+#     if config['ends'] == 'SE':
+#         return [f'trimmed/{config["trim"]}/{df.loc[(wildcards.sample), "fq"]}']
+#     else:
+#         for i in range(0, len(df)):
+#             u = df.loc[(wildcards.sample), ["fq"]].dropna()
+#             return [f'trimmed/{config["trim"]}/{u.fq[i]}', f'trimmed/{config["trim"]}/{u.fq[i + 1]}']
 
 def all_input(wildcards):
     """
@@ -125,6 +125,14 @@ def all_input(wildcards):
                 "aligned/{tool}/se/{id.sample_name}.SJ.out.tab",
                 "aligned/{tool}/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
                 id=df[['sample_name']].itertuples(), tool= config['align']
+            )
+        )
+    elif config['align']=='minimap':
+        wanted_input.extend(
+            expand(
+                ["aligned/{tool}/{id.sample_name}_aln.sorted.bam",
+                "genome/minimapindex/{a.name}.mmi"],
+                a=gdf[['name']].itertuples(), id=df[['sample_name']].itertuples(), tool= config['align']
             )
         )
 

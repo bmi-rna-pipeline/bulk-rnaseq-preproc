@@ -5,7 +5,7 @@ elif config['ends'] == 'SE':
 
 rule samtools_sort:
     input:
-        bamfile
+        bamfile,
     output:
         "aligned/{altool}/{sample}.Aligned.toTranscriptome.sorted.bam"
     params:
