@@ -1,10 +1,10 @@
 rule trimse:
     input:
-        "data/{sample}_se.{ext}",
+        "data/{sample}_{read}.{ext}",
     output:
-        "trimmed/{trtool}/{sample}_se.{ext}",
+        "trimmed/{trtool}/{sample}_{read}.{ext}",
     log:
-        "trimmed/{trtool}/logs/{sample}_se.{ext}.trimmomatic.log"
+        "trimmed/{trtool}/logs/{sample}_{read}.{ext}.trimmomatic.log"
     params:
         # list of trimmers (see manual)
         trimmer=[config['trimmparams']['adapter']],

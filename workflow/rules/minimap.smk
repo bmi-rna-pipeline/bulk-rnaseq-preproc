@@ -1,7 +1,15 @@
+if config['miniparams']['useindex'] == False:
+    if gdf.fa[0].endswith('fasta'):
+        fafile = "genome/{name}.fasta"
+    else:
+        fafile = "genome/{name}.fa"
+else:
+    fafile = "genome/minimapindex/{name}.mmi"
+
 rule minimap2:
     input:
-        target=expand("genome/minimapindex/{name}.mmi", name = NAME),  # can be either genome index or genome fasta
-        query="data/{{sample}}.{ext}".format(ext=EXT[0]),
+        target=fafile.format(name = NAME[0]),  # can be either genome index or genome fasta
+        query="data/{{sample}}_{read}.{ext}".format(ext=EXT[0], read=READS[0]),
     output:
         "aligned/{altool}/{sample}_aln.sorted.bam",
     log:
