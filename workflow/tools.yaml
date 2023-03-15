@@ -1,18 +1,24 @@
 # Select which tools to use
 # raw qc tool <fastqc>
 qc: fastqc
+# qc: fastqc
 
 # trim tool <trimmomatic/trimgalore>
-trim: trimmomatic
+trim: trimgalore
+# trim: trimmomatic
 # trim: trimgalore
 
 # alignment tool <star/minimap>
 align: star
+# align: star
 # align: minimap
 
 # alignment qc
+alqc: False
 # alqc: 
 
-# quantification tool <rsem/htseq>
-quant: rsem
+# quantification tool <rsem/htseq/salmon>
+quant: htseq
+# quant: rsem
 # quant: htseq
+# quant: salmon

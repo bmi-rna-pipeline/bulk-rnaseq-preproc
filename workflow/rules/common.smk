@@ -1,6 +1,7 @@
 from snakemake.utils import validate
 import pandas as pd
 import numpy as np
+import os
 
 df = pd.read_csv(config['samples'], dtype='str').set_index(
     ["sample_name", "reads", "fq", "ext"], drop=False)
@@ -40,13 +41,16 @@ wildcard_constraints:
 #             return [f'data/{u.fq[i]}', f'data/{u.fq[i + 1]}']
 
 # def get_trimmed(wildcards):
-#     """Get raw FASTQ files from unit sheet."""
-#     if config['ends'] == 'SE':
-#         return [f'trimmed/{config["trim"]}/{df.loc[(wildcards.sample), "fq"]}']
+#     trimpath = f'trimmed/{config["trim"]}'
+#     trimfq = os.listdir(trimpath)
+#     return trimfq
 #     else:
 #         for i in range(0, len(df)):
 #             u = df.loc[(wildcards.sample), ["fq"]].dropna()
-#             return [f'trimmed/{config["trim"]}/{u.fq[i]}', f'trimmed/{config["trim"]}/{u.fq[i + 1]}']
+#             trim1 = f'trimmed/{config["trim"]}/{u.fq[i]}'
+#             trim2 = f'trimmed/{config["trim"]}/{u.fq[i + 1]}'
+#             return trim1, trim2
+
 
 def all_input(wildcards):
     """
@@ -78,27 +82,45 @@ def all_input(wildcards):
     elif config['trim']=='trimmomatic' and config['ends'] == 'SE':
         wanted_input.extend(
             expand(
-                ["trimmed/{tool}/{id.sample_name}.{id.ext}"], 
-                id=df[['sample_name', 'ext']].itertuples(), tool= config['trim']
-            )
-        )
-
-    if config['trim']=='trimgalore' and config['ends'] == 'PE':
-        wanted_input.extend(
-            expand(
-                ["trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}",
-                "trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}.report.txt"], 
+                ["trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}"], 
                 id=df[['sample_name', 'reads', 'ext']].itertuples(), tool= config['trim']
             )
         )
-    elif config['trim']=='trimgalore' and config['ends'] == 'SE':
+
+    if config['trim'] == 'trimgalore' and config['ends'] == 'SE':
         wanted_input.extend(
             expand(
-                ["trimmed/{tool}/{id.sample_name}.{id.ext}",
-                "trimmed/{tool}/{id.sample_name}.{id.ext}.report.txt"], 
+                ["trimmed/{tool}/{id.sample_name}_se_trimmed.fq.gz",
+                "trimmed/{tool}/{id.sample_name}_se.{id.ext}"],
                 id=df[['sample_name', 'ext']].itertuples(), tool= config['trim']
             )
         )
+    
+    elif config['trim'] == 'trimgalore' and config['ends'] == 'PE':
+        wanted_input.extend(
+            expand(
+                ["trimmed/{tool}/{id.sample_name}_{id.reads}_val_{id.reads}.fq.gz",
+                "trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}"], 
+                id=df[['sample_name', 'reads', 'ext']].itertuples(), tool= config['trim']
+            )
+        )
+    
+    # if config['trim'] and EXT[0].endswith('gz'):
+    #     wanted_input.extend(
+    #         expand(
+    #             ["trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}"], 
+    #             id=df[['sample_name', 'reads', 'ext']].itertuples(), tool= config['trim']
+    #         )
+    #     )
+
+    # elif config['trim'] and not EXT[0].endswith('gz'):
+    #     wanted_input.extend(
+    #         expand(
+    #             ["trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}",
+    #             "trimmed/{tool}/{id.sample_name}_{id.reads}.{id.ext}.report.txt"], 
+    #             id=df[['sample_name', 'reads', 'ext']].itertuples(), tool= config['trim']
+    #         )
+    #     )
 
     if config['align']=='star':
         wanted_input.extend(
@@ -112,22 +134,12 @@ def all_input(wildcards):
                 "aligned/{tool}/pe/{id.sample_name}.Aligned.toTranscriptome.out.bam",
                 "aligned/{tool}/pe/{id.sample_name}.Log.out",
                 "aligned/{tool}/pe/{id.sample_name}.SJ.out.tab",
-                "aligned/{tool}/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
+                "aligned/{tool}/pe/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
                 id=df[['sample_name']].itertuples(), tool= config['align']
             )
         )
-    elif config['align']=='star' and config['ends'] == 'SE':
-        wanted_input.extend(
-            expand(
-                ["aligned/{tool}/se/{id.sample_name}.Aligned.sortedByCoord.out.bam",
-                "aligned/{tool}/se/{id.sample_name}.Aligned.toTranscriptome.out.bam",
-                "aligned/{tool}/se/{id.sample_name}.Log.out",
-                "aligned/{tool}/se/{id.sample_name}.SJ.out.tab",
-                "aligned/{tool}/{id.sample_name}.Aligned.toTranscriptome.sorted.bam",],
-                id=df[['sample_name']].itertuples(), tool= config['align']
-            )
-        )
-    elif config['align']=='minimap':
+
+    if config['align']=='minimap':
         wanted_input.extend(
             expand(
                 ["aligned/{tool}/{id.sample_name}_aln.sorted.bam",
@@ -153,5 +165,13 @@ def all_input(wildcards):
                     id=df[['sample_name']].itertuples(), tool= config['quant']
                 )
             )
+
+    if config['quant'] == 'salmon':
+        wanted_input.extend(
+            expand(
+                ["quant/{tool}/{id.sample_name}/quant.sf"],
+                id=df[['sample_name']].itertuples(), tool= config['quant']
+            )
+        )
 
     return wanted_input

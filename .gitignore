@@ -356,3 +356,14 @@ MigrationBackup/
 # old files
 old/workflow/
 scripts/.svn/
+workflow/.svn/
+workflow_tmp/
+.snakemake/
+
+# test data
+*.fastq
+*.fastq.gz
+*.fa
+*.fasta
+*.gtf
+*.gff3

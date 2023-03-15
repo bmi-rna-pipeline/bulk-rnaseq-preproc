@@ -18,8 +18,9 @@ if config['align'] == 'star':
     include: "rules/star.smk"
     include: "rules/sam.smk"
 elif config['align'] == 'minimap':
-    include: "rules/minindex.smk"
     include: "rules/minimap.smk"
+    if config['miniparams']['useindex'] == True:
+        include: "rules/minindex.smk"
 
 if config['trim'] == 'trimmomatic' and config['ends'] == 'PE':
     include: "rules/trimPE.smk"
@@ -36,6 +37,8 @@ if config['quant'] == 'rsem':
     include: "rules/rsem.smk"
 elif config['quant'] == 'htseq':
     include: "rules/htseq.smk"
+elif config['quant'] == 'salmon' and config['reads'] == 'long':
+    include: "rules/salmonlong.smk"
 
 rule all:
     input:
